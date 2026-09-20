@@ -1,0 +1,100 @@
+/*
+ * The texture sits above the page, not behind it. Every section paints an
+ * opaque background, so a layer underneath would only ever show through in the
+ * gaps — which reads as a glitch rather than as grain. Above the content, and
+ * at these opacities, it behaves the way film grain actually behaves.
+ */
+.texture {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  contain: strict;
+}
+
+/* Film grain ------------------------------------------------------------- */
+.grain {
+  position: absolute;
+  inset: -140px;
+  background-image: var(--grain);
+  background-repeat: repeat;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  will-change: transform;
+  animation: drift 6s steps(5) infinite;
+}
+
+@keyframes drift {
+  0% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-30px, 12px, 0); }
+  40% { transform: translate3d(18px, -26px, 0); }
+  60% { transform: translate3d(-22px, -14px, 0); }
+  80% { transform: translate3d(26px, 20px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* Woven scanline --------------------------------------------------------- */
+.weave {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.014) 0 1px,
+      transparent 1px 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.01) 0 1px,
+      transparent 1px 4px
+    );
+}
+
+/* Column hairlines ------------------------------------------------------- */
+.rules {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.rules > span {
+  border-left: 1px solid rgba(255, 255, 255, 0.032);
+}
+
+.rules > span:last-child {
+  border-right: 1px solid rgba(255, 255, 255, 0.032);
+}
+
+/* Vignette and top sheen ------------------------------------------------- */
+.vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      128% 70% at 50% -10%,
+      rgba(255, 255, 255, 0.03),
+      transparent 56%
+    ),
+    radial-gradient(
+      124% 104% at 50% 50%,
+      transparent 58%,
+      rgba(0, 0, 0, 0.5) 100%
+    );
+}
+
+@media (max-width: 900px) {
+  .rules {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .rules {
+    display: none;
+  }
+}

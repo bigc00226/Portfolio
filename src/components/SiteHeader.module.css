@@ -1,0 +1,76 @@
+.header {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  z-index: 6;
+  padding-block: clamp(18px, 2.6vw, 30px);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.monogram {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--rule-strong);
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--white);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  transition:
+    background 0.35s var(--ease-soft),
+    border-color 0.35s var(--ease-soft);
+}
+
+.mark:hover .monogram {
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--white);
+}
+
+.wordmark {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-mute);
+}
+
+.dot {
+  width: 3px;
+  height: 3px;
+  background: var(--text-faint);
+  border-radius: 50%;
+}
+
+@media (max-width: 640px) {
+  .wordmark {
+    display: none;
+  }
+
+  .meta {
+    font-size: 0.625rem;
+    gap: 9px;
+  }
+}
