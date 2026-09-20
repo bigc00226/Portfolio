@@ -34,9 +34,9 @@ export function ProjectRecords() {
   const chipsRef = useRef<HTMLDivElement>(null);
 
   /*
-   * The filter bar sticks to the top of the viewport, so the industry headings
-   * need to know how tall it is in order to sit below it rather than behind it.
-   * Its height changes with the viewport, so it is measured rather than guessed.
+   * 絞り込みバーは画面の上端に固定されるため、業種の見出しがその裏に
+   * 隠れないよう、バーの高さを知っている必要があります。高さは画面幅に
+   * よって変わるので、決め打ちにせず実測しています。
    */
   useEffect(() => {
     const section = sectionRef.current;
@@ -97,23 +97,21 @@ export function ProjectRecords() {
             <div>
               <p className={`mono ${styles.kicker}`}>
                 <span className={styles.kickerNum}>01</span>
-                Project records
+                開発実績
               </p>
               <h2 id="records-title" className={`display ${styles.title}`}>
-                A record of
+                これまでの
                 <br />
-                work delivered.
+                開発実績です。
               </h2>
             </div>
 
             <div className={styles.headAside}>
               <p className="lead">
-                {totalProjects} flagship engagements across {totalIndustries}{" "}
-                industries, from the first requirements meeting through to the
-                handover and the years of quiet maintenance that follow.
+                {`${totalIndustries}の業種にわたる、${totalProjects}件の主な開発実績です。最初の要件定義のお打ち合わせから、納品後の運用・保守まで一貫して担当しています。`}
               </p>
               <p className={`mono ${styles.headHint}`}>
-                Select a discipline or an industry to narrow the list
+                分野または業種を選ぶと、絞り込めます
               </p>
             </div>
           </header>
@@ -125,7 +123,7 @@ export function ProjectRecords() {
           className={styles.stats}
           data-shown={stats.active ? "true" : "false"}
           role="group"
-          aria-label="Case counts by discipline"
+          aria-label="分野ごとの件数"
         >
           {disciplineOrder.map((key, index) => {
             const isActive = discipline === key;
@@ -152,7 +150,7 @@ export function ProjectRecords() {
                   <span className={`display ${styles.statValue}`}>
                     <CountUp value={caseCounts[key]} />
                   </span>
-                  <span className={`mono ${styles.statUnit}`}>cases</span>
+                  <span className={`mono ${styles.statUnit}`}>件</span>
                 </span>
 
                 <span className={styles.meter} aria-hidden="true">
@@ -166,8 +164,7 @@ export function ProjectRecords() {
         </div>
 
         <p className={styles.statsNote}>
-          Counted by discipline across {totalProjects} flagship engagements. Most
-          projects draw on more than one, so they are recorded under each.
+          {`${totalProjects}件の開発実績を、分野ごとに数えたものです。多くの案件は複数の分野にまたがるため、それぞれの分野に計上しています。`}
         </p>
       </div>
 
@@ -176,11 +173,11 @@ export function ProjectRecords() {
         <div className={`shell ${styles.filterInner}`}>
           <div className={styles.filterRow}>
             <div className={styles.filterGroup}>
-              <span className={`mono ${styles.filterLegend}`}>Discipline</span>
+              <span className={`mono ${styles.filterLegend}`}>分野</span>
               <div
                 className={styles.segmented}
                 role="group"
-                aria-label="Filter the records by discipline"
+                aria-label="分野で絞り込む"
               >
                 <button
                   type="button"
@@ -189,7 +186,7 @@ export function ProjectRecords() {
                   aria-pressed={discipline === "all"}
                   onClick={() => setDiscipline("all")}
                 >
-                  All
+                  すべて
                 </button>
                 {disciplineOrder.map((key) => (
                   <button
@@ -210,29 +207,29 @@ export function ProjectRecords() {
               <span className={styles.countValue}>
                 {String(shown).padStart(2, "0")}
               </span>
-              {/* The wording shortens on narrow screens so the bar stays two rows. */}
+              {/* 画面が狭いときは表記を短くし、バーが二段に収まるようにしています。 */}
               <span className={`${styles.countLabel} ${styles.countLong}`}>
-                of {totalProjects} shown
+                件（全{totalProjects}件）
               </span>
               <span className={`${styles.countLabel} ${styles.countShort}`}>
                 / {totalProjects}
               </span>
               {isFiltered ? (
                 <button type="button" className={styles.reset} onClick={resetFilters}>
-                  Clear
+                  解除
                 </button>
               ) : null}
             </p>
           </div>
 
           <div className={`${styles.filterRow} ${styles.filterRowWide}`}>
-            <span className={`mono ${styles.filterLegend}`}>Industry</span>
+            <span className={`mono ${styles.filterLegend}`}>業種</span>
             <div
               ref={chipsRef}
               className={styles.chips}
               data-overflow="false"
               role="group"
-              aria-label="Filter the records by industry"
+              aria-label="業種で絞り込む"
             >
               <button
                 type="button"
@@ -241,7 +238,7 @@ export function ProjectRecords() {
                 aria-pressed={industry === "all"}
                 onClick={() => setIndustry("all")}
               >
-                All industries
+                すべての業種
               </button>
               {industries.map((group) => (
                 <button
@@ -264,7 +261,7 @@ export function ProjectRecords() {
       <div className="shell">
         {groups.length === 0 ? (
           <p className={styles.empty}>
-            No engagements match that combination. Please try another industry.
+            条件に一致する開発実績はありません。別の業種をお選びください。
           </p>
         ) : (
           <div className={styles.groups}>
@@ -275,8 +272,7 @@ export function ProjectRecords() {
                     <h3 className={`display ${styles.groupTitle}`}>{group.name}</h3>
                     <p className={styles.groupNote}>{group.note}</p>
                     <span className={`mono ${styles.groupCount}`}>
-                      {String(group.projects.length).padStart(2, "0")}{" "}
-                      {group.projects.length === 1 ? "record" : "records"}
+                      {String(group.projects.length).padStart(2, "0")}件
                     </span>
                   </header>
 

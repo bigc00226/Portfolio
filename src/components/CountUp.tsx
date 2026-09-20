@@ -6,19 +6,18 @@ import { useInView, useIsomorphicLayoutEffect } from "./useInView";
 
 type CountUpProps = {
   value: number;
-  /** Duration of the count, in milliseconds. */
+  /** 数え上げにかける時間（ミリ秒）。 */
   duration?: number;
 };
 
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 
 /**
- * Counts up to a figure once it is on screen.
+ * 画面に入ったところで、数字を数え上げます。
  *
- * The finished number is what gets server-rendered, so the page is correct
- * without JavaScript and correct for anyone who has asked for reduced motion.
- * Only after hydration — and before the first paint — does it wind back to
- * zero, ready to count.
+ * サーバーが返す HTML には最終的な数字が入っているため、JavaScript を
+ * 無効にしていても、「視差効果を減らす」設定の方にも正しい数が表示されます。
+ * 読み込まれた直後、画面が描かれる前にだけ 0 に戻し、そこから数え始めます。
  */
 export function CountUp({ value, duration = 1400 }: CountUpProps) {
   const { ref, inView } = useInView<HTMLSpanElement>(0.5);

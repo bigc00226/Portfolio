@@ -12,20 +12,18 @@ export function Reviews() {
             <div>
               <p className={`mono ${styles.kicker}`}>
                 <span className={styles.kickerNum}>02</span>
-                Client reviews
+                お客様の声
               </p>
               <h2 id="reviews-title" className={`display ${styles.title}`}>
-                What clients say
+                稼働したあとに
                 <br />
-                once it is live.
+                いただいた言葉です。
               </h2>
             </div>
 
             <div className={styles.headAside}>
               <p className="lead">
-                The records above are only half the story. What follows is what the
-                people who commissioned that work had to say once the systems had
-                been running for a while.
+                {"開発実績だけではお伝えしきれない部分を、実際にご依頼くださった皆さまのお言葉でご紹介します。いずれも、しばらく運用いただいたあとにお寄せいただいたものです。"}
               </p>
             </div>
           </header>
@@ -41,15 +39,17 @@ export function Reviews() {
             </div>
 
             <div className={styles.scoreMeta}>
-              <Stars rating={Math.round(averageRating)} label={`${averageRating} out of 5`} />
+              <Stars
+                rating={Math.round(averageRating)}
+                label={`5点満点中${averageRating}点`}
+              />
               <p className={`mono ${styles.scoreCount}`}>
-                Average across {reviewCount} published reviews
+                掲載{reviewCount}件の平均評価
               </p>
             </div>
 
             <p className={styles.scoreNote}>
-              Reviews are published with the client&rsquo;s permission and are
-              attributed by role and sector rather than by company name.
+              {"お客様の許可をいただいたうえで掲載しています。企業名ではなく、役職と業種でご紹介しています。"}
             </p>
           </div>
         </Reveal>
@@ -65,7 +65,7 @@ export function Reviews() {
 
                   <Stars
                     rating={review.rating}
-                    label={`Rated ${review.rating} out of 5`}
+                    label={`5点満点中${review.rating}点の評価`}
                   />
 
                   <h3 className={`display ${styles.cardTitle}`}>{review.headline}</h3>

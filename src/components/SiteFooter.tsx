@@ -15,7 +15,7 @@ export function SiteFooter() {
         <p className={`mono ${styles.line}`}>
           <span>&copy; {new Date().getFullYear()}</span>
           <a className={styles.top} href="#main">
-            Back to top
+            {site.footer.backToTop}
           </a>
         </p>
       </div>

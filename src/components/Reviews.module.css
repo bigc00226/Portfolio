@@ -2,16 +2,15 @@
   position: relative;
   padding-block: clamp(84px, 11vw, 160px) clamp(90px, 12vw, 170px);
   border-top: 1px solid var(--rule-faint);
-  background:
-    radial-gradient(
-      100% 60% at 50% 0%,
-      rgba(255, 255, 255, 0.035),
-      transparent 60%
-    ),
-    linear-gradient(180deg, var(--raise-1), var(--base) 62%, var(--black));
+  background: linear-gradient(
+    180deg,
+    var(--raise-1) 0%,
+    var(--white) 46%,
+    var(--raise-1) 100%
+  );
 }
 
-/* Head ------------------------------------------------------------------- */
+/* 見出し ----------------------------------------------------------------- */
 
 .head {
   display: grid;
@@ -36,22 +35,24 @@
   min-width: 26px;
   height: 20px;
   padding-inline: 6px;
-  background: var(--white);
-  color: var(--black);
+  background: var(--ink);
+  color: var(--white);
   font-weight: 600;
   letter-spacing: 0.1em;
 }
 
 .title {
-  font-size: clamp(2.2rem, 5.6vw, 4.6rem);
-  color: var(--white);
+  font-size: clamp(2rem, 5.2vw, 4.2rem);
+  font-weight: 900;
+  line-height: 1.24;
+  color: var(--ink);
 }
 
 .headAside {
   padding-bottom: 6px;
 }
 
-/* Aggregate -------------------------------------------------------------- */
+/* 平均評価 --------------------------------------------------------------- */
 
 .aggregate {
   display: grid;
@@ -70,11 +71,11 @@
 
 .scoreValue {
   font-size: clamp(3rem, 6vw, 5rem);
-  font-weight: 800;
+  font-weight: 900;
   font-variation-settings: "wdth" 96;
   letter-spacing: -0.055em;
   line-height: 0.84;
-  color: var(--white);
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
 
@@ -94,19 +95,20 @@
 }
 
 .scoreNote {
-  max-width: 44ch;
+  max-width: 30em;
   margin-left: auto;
   font-size: 0.8125rem;
-  line-height: 1.6;
+  line-height: 1.85;
   color: var(--text-faint);
   text-align: right;
 }
 
-/* Stars ------------------------------------------------------------------ */
+/* 評価の星 --------------------------------------------------------------- */
 
 .stars {
   display: inline-flex;
   gap: 4px;
+  line-height: 1;
 }
 
 .star {
@@ -114,10 +116,10 @@
 }
 
 .star[data-filled="true"] {
-  fill: var(--white);
+  fill: var(--ink);
 }
 
-/* Cards ------------------------------------------------------------------ */
+/* カード ----------------------------------------------------------------- */
 
 .grid {
   display: grid;
@@ -132,7 +134,7 @@
 
 .cell {
   display: flex;
-  background: var(--raise-1);
+  background: var(--white);
 }
 
 .cardWrap {
@@ -145,7 +147,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   margin: 0;
   padding: clamp(26px, 2.8vw, 40px);
   overflow: hidden;
@@ -158,7 +160,7 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.055),
+    rgba(11, 11, 11, 0.045),
     transparent 40%
   );
   opacity: 0;
@@ -167,7 +169,7 @@
 }
 
 .card:hover {
-  background: var(--raise-2);
+  background: var(--raise-1);
 }
 
 .card:hover::before {
@@ -176,41 +178,41 @@
 
 .quoteMark {
   position: absolute;
-  top: -0.22em;
-  right: 0.1em;
+  top: -0.2em;
+  right: 0.08em;
   font-family: var(--font-display), serif;
-  font-size: 11rem;
-  font-weight: 800;
+  font-size: 10rem;
+  font-weight: 900;
   line-height: 1;
-  color: rgba(255, 255, 255, 0.035);
+  color: rgba(11, 11, 11, 0.045);
   pointer-events: none;
   user-select: none;
 }
 
 .cardTitle {
   position: relative;
-  font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.3125rem);
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.16;
-  color: var(--white);
-  text-wrap: balance;
+  font-size: clamp(1rem, 0.96rem + 0.3vw, 1.1875rem);
+  font-weight: 800;
+  letter-spacing: -0.006em;
+  line-height: 1.55;
+  color: var(--ink);
 }
 
 .quote {
   position: relative;
   margin: 0;
-  font-size: 0.9375rem;
-  line-height: 1.7;
+  font-size: 0.875rem;
+  line-height: 2.05;
   color: var(--text-dim);
-  text-wrap: pretty;
+  word-break: auto-phrase;
+  line-break: strict;
 }
 
 .author {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   margin-top: auto;
   padding-top: 20px;
   border-top: 1px solid var(--rule-faint);
@@ -218,23 +220,25 @@
 
 .authorName {
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
+  line-height: 1.7;
   color: var(--text);
 }
 
 .authorRole,
 .authorOrg {
   font-size: 0.8125rem;
-  line-height: 1.5;
+  line-height: 1.7;
   color: var(--text-mute);
 }
 
 .sector {
   margin-top: 10px;
+  letter-spacing: 0.12em;
   color: var(--text-faint);
 }
 
-/* Responsive ------------------------------------------------------------- */
+/* 画面幅への対応 --------------------------------------------------------- */
 
 @media (max-width: 1080px) {
   .head {

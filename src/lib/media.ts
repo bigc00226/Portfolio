@@ -4,11 +4,11 @@ import path from "node:path";
 const publicDir = path.join(process.cwd(), "public");
 
 /**
- * Checks whether a file is actually present in /public.
+ * /public に実際にファイルがあるかどうかを確認します。
  *
- * This runs on the server while the page is rendered, which lets the banner
- * decide whether to render a <video> element at all. Without it the browser
- * would request a video that is not there and log a 404 on every visit.
+ * ページを組み立てるときにサーバー側で動くため、バナーは <video> 要素を
+ * 出すかどうかを判断できます。これがないと、置いていない動画をブラウザが
+ * 取りにいき、訪問のたびに 404 が記録されてしまいます。
  */
 export async function publicFileExists(publicPath: string): Promise<boolean> {
   try {

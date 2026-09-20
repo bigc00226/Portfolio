@@ -1,17 +1,16 @@
 /**
- * Client reviews.
+ * お客様の声。
  *
- * These are written as representative examples so the section is complete and
- * presentable from the first build. Replace the quotes and attributions with
- * your own before the site goes live; the aggregate rating shown on the page
- * is calculated from whatever is listed here.
+ * 初回のビルドからページが完成した状態で見られるよう、代表的な内容として
+ * 書き起こしたサンプルです。公開前に、実際にいただいたお言葉へ差し替えて
+ * ください。ページに表示される平均評価は、このファイルの内容から計算します。
  */
 
 export type Review = {
   id: string;
-  /** Whole stars, 1 to 5. */
+  /** 1〜5の整数。 */
   rating: number;
-  /** A few words pulled from the quote, used as the card heading. */
+  /** お言葉から抜き出した、カードの見出し。 */
   headline: string;
   quote: string;
   author: string;
@@ -24,101 +23,101 @@ export const reviews: Review[] = [
   {
     id: "r1",
     rating: 5,
-    headline: "They studied the shop floor before proposing anything",
+    headline: "ご提案の前に、現場をよく見ていただきました",
     quote:
-      "We had been running three disconnected systems on the shop floor, and nobody could tell us what our real throughput was. The rollout was staged so carefully that we never lost a day of production, and the predictive maintenance model flagged a spindle failure in the second month that would have cost us a week. What impressed me most was how much time was spent watching how we actually work before a single line was written.",
-    author: "T. Nakamura",
-    role: "Plant Operations Director",
-    organization: "Automotive parts manufacturer, Aichi",
-    sector: "Manufacturing",
+      "工場では三つのシステムがばらばらに動いていて、実際の生産数を誰も正確に把握できていませんでした。導入は工程を分けて慎重に進めていただき、生産を止めた日は一日もありません。予知保全のモデルは二か月目に主軸の不調を検知し、一週間分の停止を未然に防ぐことができました。何より、手を動かし始める前に私どもの仕事の進め方をじっくり見ていただけたことが、強く印象に残っています。",
+    author: "中村 様",
+    role: "工場運営部長",
+    organization: "自動車部品メーカー（愛知県）",
+    sector: "製造業",
   },
   {
     id: "r2",
     rating: 5,
-    headline: "Our requirements were questioned, not just accepted",
+    headline: "要望をそのまま受け取らず、確かめてくださいました",
     quote:
-      "Working alongside clinical staff is rarely straightforward, and we valued that our requirements were questioned rather than simply written down. Reception and billing now take our front desk roughly half the time they used to, and the handover documentation was thorough enough that our in-house team picked up maintenance without any difficulty at all.",
-    author: "M. Saito",
-    role: "Hospital Information Systems Manager",
-    organization: "400-bed general hospital",
-    sector: "Healthcare",
+      "医療現場の要望はなかなかまとまらないものですが、こちらの言うことをそのまま受け取るのではなく、一つひとつ背景まで確かめていただけたのが何よりありがたく感じました。受付と医事会計にかかる時間は、以前のおよそ半分になっています。引き継ぎの資料も丁寧で、院内の担当者だけで無理なく運用を続けられております。",
+    author: "斉藤 様",
+    role: "病院情報システム室長",
+    organization: "400床の総合病院",
+    sector: "医療・ヘルスケア",
   },
   {
     id: "r3",
     rating: 5,
-    headline: "Launched on the date we agreed",
+    headline: "お約束の日に、予定どおり公開できました",
     quote:
-      "Keeping stock in step across our own shop, Rakuten, and Amazon used to occupy one person for most of every morning. That job simply no longer exists. PayPay and card payments went live without a single failed settlement, and we launched on the date we had agreed months earlier, which in my experience is genuinely rare.",
-    author: "A. Fujimoto",
-    role: "E-Commerce Manager",
-    organization: "Apparel brand, Tokyo",
-    sector: "Retail & E-Commerce",
+      "自社サイトと楽天、Amazonの在庫を合わせる作業に、毎朝ひとり分の時間を取られておりました。その仕事自体がなくなりました。PayPayとカード決済も決済エラーなく稼働し、数か月前にお約束した公開日に、そのまま間に合っています。正直に申しまして、これはなかなかないことだと思います。",
+    author: "藤本 様",
+    role: "EC事業マネージャー",
+    organization: "アパレルブランド（東京都）",
+    sector: "小売・EC",
   },
   {
     id: "r4",
     rating: 5,
-    headline: "The first version was wrong, and that was handled well",
+    headline: "最初の版は外れましたが、その後の対応が誠実でした",
     quote:
-      "Route optimization sounds straightforward until you try it with real drivers and real traffic. Our dispatchers were skeptical at first, and they were right to be — the first version did not account for the order in which a truck is actually loaded. That feedback was taken seriously and reworked within two weeks. We now run noticeably shorter routes, and the team trusts the plan it is given.",
-    author: "K. Ishikawa",
-    role: "Distribution Center Manager",
-    organization: "Regional logistics operator",
-    sector: "Logistics",
+      "ルート最適化は、実際のドライバーと道路事情を前にすると、そう簡単なものではありません。配車担当は当初懐疑的でしたが、それも当然で、最初の版はトラックへの積み込み順まで考慮できていませんでした。その指摘を真摯に受け止めていただき、二週間で作り直していただけました。いまでは走行距離が目に見えて短くなり、現場も提示される計画を信頼しております。",
+    author: "石川 様",
+    role: "物流センター長",
+    organization: "地域物流事業者",
+    sector: "物流",
   },
   {
     id: "r5",
     rating: 5,
-    headline: "Two summers without a single intervention",
+    headline: "二度の夏を、手を入れずに越えました",
     quote:
-      "We are a farming cooperative, not a technology company, and we needed someone willing to spend time in the greenhouses before writing any code. The monitoring system has now run through two summers without a single intervention, and the harvest forecasts have become accurate enough that we plan our shipping around them.",
-    author: "H. Ogawa",
-    role: "Managing Director",
-    organization: "Agricultural cooperative, Nagano",
-    sector: "Agriculture",
+      "私どもは農業の組合であってIT企業ではございませんので、コードを書き始める前にハウスへ足を運んでくださる方を探しておりました。監視システムは二度の夏を、一度も手を入れることなく越えています。収穫量の予測も、出荷の計画を組めるほどの精度になりました。",
+    author: "小川 様",
+    role: "代表理事",
+    organization: "農業協同組合（長野県）",
+    sector: "農林水産業",
   },
   {
     id: "r6",
     rating: 5,
-    headline: "Every accessibility requirement met on the first review",
+    headline: "アクセシビリティ要件を、一度の審査で満たしました",
     quote:
-      "Public procurement brings a great deal of paperwork and a long list of accessibility and security requirements. All of it was met at the first review, which saved us months of correspondence. Residents can now complete most applications from a phone, and My Number Card authentication has worked reliably since the day we opened it.",
-    author: "Y. Tanabe",
-    role: "Digital Transformation Officer",
-    organization: "City government",
-    sector: "Public Sector",
+      "公共調達は書類も多く、アクセシビリティやセキュリティの要件も細かく定められております。それらを一度目の審査ですべて満たしていただき、数か月分のやり取りを省くことができました。住民の皆さまはほとんどの申請をスマートフォンから行えるようになり、マイナンバーカード認証も公開初日から安定して動いております。",
+    author: "田辺 様",
+    role: "DX推進担当",
+    organization: "市役所",
+    sector: "行政・公共",
   },
   {
     id: "r7",
     rating: 5,
-    headline: "Answered with evidence rather than assurance",
+    headline: "所感ではなく、根拠でお答えいただきました",
     quote:
-      "Our compliance team is not easily satisfied, and the fraud detection work was reviewed line by line. Every question came back answered with evidence rather than assurance. False positives fell substantially without our loosening a single threshold, and the audit trail has already stood up to an external examination.",
-    author: "S. Mori",
-    role: "Head of Risk",
-    organization: "Regional financial institution",
-    sector: "Finance",
+      "当行のコンプライアンス部門は厳しく、不正検知の仕組みも一行ずつ確認いたしました。どの質問にも、所感ではなく根拠を添えてご回答をいただいております。閾値を緩めることなく誤検知は大きく減り、監査証跡も外部監査に問題なく耐えております。",
+    author: "森 様",
+    role: "リスク管理部長",
+    organization: "地域金融機関",
+    sector: "金融",
   },
   {
     id: "r8",
     rating: 5,
-    headline: "We were never made to feel like a small client",
+    headline: "小さな取引先として扱われることはありませんでした",
     quote:
-      "We are a small company, and we were quietly worried about being a small client. It never once showed. Invoice OCR now handles the bulk of our monthly processing, the Qualified Invoice System requirements were taken care of before we had even thought to ask about them, and support has been prompt every time we have needed it.",
-    author: "R. Kubo",
-    role: "Head of Administration",
-    organization: "Construction materials supplier",
-    sector: "Business Administration",
+      "当社は小さな会社ですので、正直なところ後回しにされないかと案じておりました。そうした気配は一度もございませんでした。請求書のOCRは毎月の処理の大半を引き受けてくれていますし、インボイス制度への対応も、こちらが気づく前に済ませていただいておりました。お問い合わせへのご返信もいつも早く、助かっております。",
+    author: "久保 様",
+    role: "管理部長",
+    organization: "建材商社",
+    sector: "バックオフィス",
   },
   {
     id: "r9",
     rating: 5,
-    headline: "Told honestly what was not worth building",
+    headline: "つくらないほうがよい部分も、率直に教えていただきました",
     quote:
-      "We arrived with a vague ambition to make use of AI and left with something specific and genuinely useful. Knowledge search across our internal documents is now simply part of how the team works. Just as valuable, we were told plainly which parts of our original wish list were not worth building, and that honesty saved us a considerable amount of money.",
-    author: "N. Hayashi",
-    role: "Chief Technology Officer",
-    organization: "Professional services firm",
-    sector: "Enterprise AI",
+      "「AIを使いたい」という漠然とした思いだけでご相談に伺いましたが、具体的で、実際に役立つものができあがりました。社内文書のナレッジ検索は、いまではチームの仕事の一部になっております。同じくらいありがたかったのは、当初の要望のうちつくらないほうがよい部分を、はっきりとお伝えいただけたことです。おかげで費用をかなり抑えることができました。",
+    author: "林 様",
+    role: "取締役CTO",
+    organization: "専門サービス企業",
+    sector: "企業向けAI",
   },
 ];
 

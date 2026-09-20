@@ -6,9 +6,9 @@ import { publicFileExists } from "@/lib/media";
 
 export default async function HomePage() {
   /*
-   * Only hand the banner the media that is genuinely on disk. Drop a file into
-   * public/media and it is picked up on the next render; until then the banner
-   * shows its designed still and asks the browser for nothing.
+   * 実際に置かれているファイルだけをバナーに渡します。public/media に
+   * 置けば次の描画から読み込まれ、それまでは用意した静止画面が表示され、
+   * ブラウザは何も取りにいきません。
    */
   const available = await Promise.all(
     site.banner.sources.map(async (source) => ({

@@ -1,8 +1,7 @@
 /*
- * The texture sits above the page, not behind it. Every section paints an
- * opaque background, so a layer underneath would only ever show through in the
- * gaps — which reads as a glitch rather than as grain. Above the content, and
- * at these opacities, it behaves the way film grain actually behaves.
+ * 質感は本文の手前に置いています。各セクションは不透明な背景を持つため、
+ * 背面に敷くと隙間からしか見えず、かえって不自然に映ります。
+ * 手前に重ね、この程度の濃度に抑えることで、紙の粒子のように働きます。
  */
 .texture {
   position: fixed;
@@ -12,14 +11,14 @@
   contain: strict;
 }
 
-/* Film grain ------------------------------------------------------------- */
+/* 粒子 ------------------------------------------------------------------- */
 .grain {
   position: absolute;
   inset: -140px;
   background-image: var(--grain);
   background-repeat: repeat;
-  opacity: 0.05;
-  mix-blend-mode: overlay;
+  opacity: 0.042;
+  mix-blend-mode: multiply;
   will-change: transform;
   animation: drift 6s steps(5) infinite;
 }
@@ -33,24 +32,24 @@
   100% { transform: translate3d(0, 0, 0); }
 }
 
-/* Woven scanline --------------------------------------------------------- */
+/* 織り目 ----------------------------------------------------------------- */
 .weave {
   position: absolute;
   inset: 0;
   background-image:
     repeating-linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.014) 0 1px,
+      rgba(11, 11, 11, 0.016) 0 1px,
       transparent 1px 3px
     ),
     repeating-linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0.01) 0 1px,
+      rgba(11, 11, 11, 0.012) 0 1px,
       transparent 1px 4px
     );
 }
 
-/* Column hairlines ------------------------------------------------------- */
+/* 段組みの罫 ------------------------------------------------------------- */
 .rules {
   position: absolute;
   inset: 0;
@@ -63,28 +62,22 @@
 }
 
 .rules > span {
-  border-left: 1px solid rgba(255, 255, 255, 0.032);
+  border-left: 1px solid rgba(11, 11, 11, 0.038);
 }
 
 .rules > span:last-child {
-  border-right: 1px solid rgba(255, 255, 255, 0.032);
+  border-right: 1px solid rgba(11, 11, 11, 0.038);
 }
 
-/* Vignette and top sheen ------------------------------------------------- */
+/* 周辺の沈み ------------------------------------------------------------- */
 .vignette {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(
-      128% 70% at 50% -10%,
-      rgba(255, 255, 255, 0.03),
-      transparent 56%
-    ),
-    radial-gradient(
-      124% 104% at 50% 50%,
-      transparent 58%,
-      rgba(0, 0, 0, 0.5) 100%
-    );
+  background: radial-gradient(
+    126% 106% at 50% 44%,
+    transparent 58%,
+    rgba(11, 11, 11, 0.055) 100%
+  );
 }
 
 @media (max-width: 900px) {

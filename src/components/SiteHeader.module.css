@@ -29,23 +29,25 @@
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.02em;
-  color: var(--white);
-  background: rgba(0, 0, 0, 0.35);
+  line-height: 1;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(6px);
   transition:
     background 0.35s var(--ease-soft),
+    color 0.35s var(--ease-soft),
     border-color 0.35s var(--ease-soft);
 }
 
 .mark:hover .monogram {
-  background: var(--white);
-  color: var(--black);
-  border-color: var(--white);
+  background: var(--ink);
+  color: var(--white);
+  border-color: var(--ink);
 }
 
 .wordmark {
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--text);
 }
@@ -64,7 +66,7 @@
   border-radius: 50%;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 720px) {
   .wordmark {
     display: none;
   }

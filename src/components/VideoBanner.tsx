@@ -11,7 +11,7 @@ type MediaState = "loading" | "playing" | "unavailable";
 export type BannerSource = { src: string; type: string };
 
 type VideoBannerProps = {
-  /** Only the files that were found in /public — often none, at first. */
+  /** /public で見つかったファイルだけ。最初は空のことが多くあります。 */
   sources: BannerSource[];
   poster?: string;
 };
@@ -27,7 +27,7 @@ export function VideoBanner({ sources, poster }: VideoBannerProps) {
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
 
-  /* Anyone who prefers reduced motion gets a still frame, not a moving one. */
+  /* 「視差効果を減らす」設定の方には、動かない一枚絵をお見せします。 */
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -69,7 +69,7 @@ export function VideoBanner({ sources, poster }: VideoBannerProps) {
   return (
     <section className={styles.banner} aria-labelledby="banner-headline">
       <div className={styles.media} data-state={state}>
-        {/* Shown until the video is ready, and left in place if none is found. */}
+        {/* 動画の準備ができるまで表示し、ファイルがない場合はそのまま残ります。 */}
         <div className={styles.still} aria-hidden="true" />
 
         {hasVideo ? (
@@ -128,7 +128,7 @@ export function VideoBanner({ sources, poster }: VideoBannerProps) {
           <span className={styles.scrollRail} aria-hidden="true">
             <span className={styles.scrollDot} />
           </span>
-          <span className="mono">Project records</span>
+          <span className="mono">{banner.scrollLabel}</span>
         </a>
 
         {hasVideo && state !== "unavailable" ? (
@@ -137,24 +137,34 @@ export function VideoBanner({ sources, poster }: VideoBannerProps) {
               type="button"
               className={styles.control}
               onClick={togglePlayback}
-              aria-label={isPaused ? "Play the banner video" : "Pause the banner video"}
+              aria-label={
+                isPaused
+                  ? banner.controls.playLabel
+                  : banner.controls.pauseLabel
+              }
             >
               <span className={styles.controlIcon} aria-hidden="true">
                 {isPaused ? <PlayIcon /> : <PauseIcon />}
               </span>
-              <span className="mono">{isPaused ? "Play" : "Pause"}</span>
+              <span className="mono">
+                {isPaused ? banner.controls.play : banner.controls.pause}
+              </span>
             </button>
 
             <button
               type="button"
               className={styles.control}
               onClick={toggleSound}
-              aria-label={isMuted ? "Unmute the banner video" : "Mute the banner video"}
+              aria-label={
+                isMuted ? banner.controls.unmuteLabel : banner.controls.muteLabel
+              }
             >
               <span className={styles.controlIcon} aria-hidden="true">
                 {isMuted ? <MutedIcon /> : <SoundIcon />}
               </span>
-              <span className="mono">{isMuted ? "Sound off" : "Sound on"}</span>
+              <span className="mono">
+                {isMuted ? banner.controls.soundOff : banner.controls.soundOn}
+              </span>
             </button>
           </div>
         ) : null}

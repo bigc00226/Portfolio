@@ -6,12 +6,12 @@ import { useEntrance } from "./useInView";
 
 type RevealProps = {
   children: ReactNode;
-  /** Stagger, in milliseconds. */
+  /** ずらして表示する時間（ミリ秒）。 */
   delay?: number;
   className?: string;
 };
 
-/** Fades and lifts its contents into place the first time they are seen. */
+/** 初めて画面に入ったとき、内容をゆっくり浮かび上がらせます。 */
 export function Reveal({ children, delay = 0, className }: RevealProps) {
   const { ref, active } = useEntrance<HTMLDivElement>();
 

@@ -2,14 +2,14 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-/** useLayoutEffect warns when it runs on the server, so stand in for it there. */
+/** useLayoutEffect はサーバー側で警告を出すため、その場合は useEffect を使います。 */
 export const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 /**
- * Reports the first time an element scrolls into view, then stops observing.
- * Falls back to "visible" wherever IntersectionObserver is unavailable, so
- * content is never left hidden.
+ * 要素が初めて画面に入ったことを知らせ、以降は監視を止めます。
+ * IntersectionObserver が使えない環境では「表示済み」として扱うため、
+ * 内容が隠れたままになることはありません。
  */
 export function useInView<T extends HTMLElement>(
   threshold = 0.18,
@@ -47,12 +47,11 @@ export function useInView<T extends HTMLElement>(
 }
 
 /**
- * The same idea, but safe for anyone without JavaScript.
+ * 同じ仕組みを、JavaScript を無効にしている方にも配慮したかたちにしたものです。
  *
- * `active` is true in the server-rendered HTML, so the page reads perfectly
- * with scripts turned off. The moment the component hydrates — before the
- * browser paints, so nothing flickers — it hands control back to the observer
- * and the entrance animation plays as intended.
+ * サーバーが返す HTML では active が true になるため、スクリプトを切っていても
+ * ページはそのまま読めます。読み込まれた直後（画面が描かれる前）に監視へ
+ * 切り替わり、意図したとおりの表示アニメーションが始まります。
  */
 export function useEntrance<T extends HTMLElement>(threshold?: number) {
   const { ref, inView } = useInView<T>(threshold);

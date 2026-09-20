@@ -1,28 +1,29 @@
-# Banner media
+# バナーの動画について
 
-The banner on the landing page looks for these files:
+トップページのバナーは、このフォルダにある次のファイルを探します。
 
-| File | Purpose |
+| ファイル名 | 役割 |
 | --- | --- |
-| `banner.mp4` | The banner video. **Required** for the video to play. |
-| `banner.webm` | Optional. Served first where the browser supports it. |
-| `banner-poster.jpg` | Optional. The first frame, shown while the video loads. |
+| `banner.mp4` | バナーの動画です。再生するには**このファイルが必要**です。 |
+| `banner.webm` | 任意です。対応しているブラウザでは、こちらが優先されます。 |
+| `banner-poster.jpg` | 任意です。読み込み中に表示する一枚絵です。 |
 
-Until `banner.mp4` is added, the banner falls back to a designed still, so the
-page never looks broken. Drop the files in here and reload — no code changes are
-needed. The paths are configurable in `src/data/site.ts`.
+`banner.mp4` を置くまでの間は、用意した静止画面が表示されます。ページが崩れて
+見えることはありませんので、ご安心ください。ファイルをこのフォルダに置いて
+再読み込みしていただくだけで、コードを触る必要はありません。ファイル名は
+`src/data/site.ts` で変更できます。
 
-The page checks on the server which of these files actually exist, so nothing is
-requested that is not there. In `npm run dev` a new file is picked up on the next
-reload; for a production deployment, add the file and run `npm run build` again.
+どのファイルが実際に置かれているかはサーバー側で確認しているため、存在しない
+ファイルをブラウザが取りにいくことはありません。`npm run dev` では次の再読み込み
+から反映されます。本番環境では、ファイルを追加したあとに `npm run build` を
+もう一度実行してください。
 
-A few things worth knowing:
+## 動画を用意されるときに
 
-- The video is rendered in black and white (`filter: grayscale(1)`), so colour
-  in the source file is not important. Contrast and movement are.
-- It plays muted, looped, and inline, which is what browsers require in order to
-  autoplay. Visitors can pause it or turn the sound on from the controls in the
-  bottom-right corner.
-- Aim for roughly 6–12 seconds, 1920×1080, H.264, and under about 6 MB. Anything
-  heavier will slow the first paint noticeably.
-- Visitors who have asked for reduced motion see the poster frame instead, paused.
+- ページ全体に合わせて、動画は白黒で表示します（`filter: grayscale(1)`）。
+  色よりも、明暗の差と動きの大きさのほうが仕上がりに効いてきます。
+- ブラウザが自動再生を許可する条件に合わせ、音声を消した状態で、繰り返し再生
+  します。音声の再生と一時停止は、画面右下のボタンから切り替えられます。
+- 長さは6〜12秒ほど、1920×1080、H.264、容量は6MB以下を目安になさってください。
+  これより重いと、最初の表示が目に見えて遅くなります。
+- OS で「視差効果を減らす」を設定されている方には、動かない一枚絵を表示します。
