@@ -1,11 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import { CountUp } from "./CountUp";
 import { Reveal } from "./Reveal";
 import { useEntrance } from "./useInView";
 import {
+  allIndustriesImage,
   caseCounts,
   disciplineLabels,
   disciplineNotes,
@@ -24,6 +26,10 @@ type IndustryFilter = string | "all";
 
 const peakCount = Math.max(...disciplineOrder.map((d) => caseCounts[d]));
 
+/** イラストの読み込み幅。実際に表示される大きさに合わせています。 */
+const TILE_SIZES =
+  "(max-width: 620px) 44vw, (max-width: 900px) 30vw, (max-width: 1200px) 22vw, 15vw";
+
 export function ProjectRecords() {
   const [discipline, setDiscipline] = useState<DisciplineFilter>("all");
   const [industry, setIndustry] = useState<IndustryFilter>("all");
@@ -31,7 +37,6 @@ export function ProjectRecords() {
 
   const sectionRef = useRef<HTMLElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
-  const chipsRef = useRef<HTMLDivElement>(null);
 
   /*
    * 絞り込みバーは画面の上端に固定されるため、業種の見出しがその裏に
@@ -41,13 +46,10 @@ export function ProjectRecords() {
   useEffect(() => {
     const section = sectionRef.current;
     const bar = barRef.current;
-    const chips = chipsRef.current;
-    if (!section || !bar || !chips) return;
+    if (!section || !bar) return;
 
     const measure = () => {
       section.style.setProperty("--filter-height", `${bar.offsetHeight}px`);
-      chips.dataset.overflow =
-        chips.scrollWidth > chips.clientWidth + 1 ? "true" : "false";
     };
 
     measure();
@@ -59,9 +61,19 @@ export function ProjectRecords() {
 
     const observer = new ResizeObserver(measure);
     observer.observe(bar);
-    observer.observe(chips);
     return () => observer.disconnect();
   }, []);
+
+  /** 分野の絞り込みだけを反映した件数。業種タイルに出す数字です。 */
+  const countsByIndustry = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const group of industries) {
+      counts[group.id] = group.projects.filter(
+        (project) => discipline === "all" || project.disciplines.includes(discipline),
+      ).length;
+    }
+    return counts;
+  }, [discipline]);
 
   const groups = useMemo(() => {
     return industries
@@ -78,6 +90,7 @@ export function ProjectRecords() {
 
   const shown = groups.reduce((total, group) => total + group.projects.length, 0);
   const isFiltered = discipline !== "all" || industry !== "all";
+  const selectedIndustry = industries.find((group) => group.id === industry);
 
   const resetFilters = () => {
     setDiscipline("all");
@@ -117,7 +130,7 @@ export function ProjectRecords() {
           </header>
         </Reveal>
 
-        {/* Case counts ------------------------------------------------- */}
+        {/* 分野ごとの件数 ------------------------------------------------ */}
         <div
           ref={stats.ref}
           className={styles.stats}
@@ -136,9 +149,7 @@ export function ProjectRecords() {
                 data-active={isActive ? "true" : "false"}
                 aria-pressed={isActive}
                 onClick={() => setDiscipline(isActive ? "all" : key)}
-                style={
-                  { "--share": caseCounts[key] / peakCount } as CSSProperties
-                }
+                style={{ "--share": caseCounts[key] / peakCount } as CSSProperties}
               >
                 <span className={`mono ${styles.statIndex}`}>
                   {String(index + 1).padStart(2, "0")}
@@ -166,98 +177,150 @@ export function ProjectRecords() {
         <p className={styles.statsNote}>
           {`${totalProjects}件の開発実績を、分野ごとに数えたものです。多くの案件は複数の分野にまたがるため、それぞれの分野に計上しています。`}
         </p>
-      </div>
 
-      {/* Filters ------------------------------------------------------- */}
-      <div ref={barRef} className={styles.filterBar}>
-        <div className={`shell ${styles.filterInner}`}>
-          <div className={styles.filterRow}>
-            <div className={styles.filterGroup}>
-              <span className={`mono ${styles.filterLegend}`}>分野</span>
-              <div
-                className={styles.segmented}
-                role="group"
-                aria-label="分野で絞り込む"
-              >
-                <button
-                  type="button"
-                  className={styles.segment}
-                  data-active={discipline === "all" ? "true" : "false"}
-                  aria-pressed={discipline === "all"}
-                  onClick={() => setDiscipline("all")}
-                >
-                  すべて
-                </button>
-                {disciplineOrder.map((key) => (
-                  <button
-                    key={key}
-                    type="button"
-                    className={styles.segment}
-                    data-active={discipline === key ? "true" : "false"}
-                    aria-pressed={discipline === key}
-                    onClick={() => setDiscipline(key)}
-                  >
-                    {disciplineShortLabels[key]}
-                  </button>
-                ))}
-              </div>
-            </div>
+        {/* 業種から探す -------------------------------------------------- */}
+        <Reveal>
+          <div className={styles.picker}>
+            <p className={`mono ${styles.pickerLabel}`}>業種から探す</p>
 
-            <p className={`mono ${styles.count}`} role="status">
-              <span className={styles.countValue}>
-                {String(shown).padStart(2, "0")}
-              </span>
-              {/* 画面が狭いときは表記を短くし、バーが二段に収まるようにしています。 */}
-              <span className={`${styles.countLabel} ${styles.countLong}`}>
-                件（全{totalProjects}件）
-              </span>
-              <span className={`${styles.countLabel} ${styles.countShort}`}>
-                / {totalProjects}
-              </span>
-              {isFiltered ? (
-                <button type="button" className={styles.reset} onClick={resetFilters}>
-                  解除
-                </button>
-              ) : null}
-            </p>
-          </div>
-
-          <div className={`${styles.filterRow} ${styles.filterRowWide}`}>
-            <span className={`mono ${styles.filterLegend}`}>業種</span>
-            <div
-              ref={chipsRef}
-              className={styles.chips}
-              data-overflow="false"
-              role="group"
-              aria-label="業種で絞り込む"
-            >
+            <div className={styles.tiles} role="group" aria-label="業種で絞り込む">
               <button
                 type="button"
-                className={styles.chip}
+                className={styles.tile}
                 data-active={industry === "all" ? "true" : "false"}
                 aria-pressed={industry === "all"}
                 onClick={() => setIndustry("all")}
               >
-                すべての業種
+                <span className={styles.tileImage}>
+                  <Image
+                    src={allIndustriesImage}
+                    alt=""
+                    fill
+                    sizes={TILE_SIZES}
+                    placeholder="blur"
+                  />
+                </span>
+                <span className={styles.tileMeta}>
+                  <span className={styles.tileName}>すべての業種</span>
+                  <span className={`mono ${styles.tileCount}`}>
+                    {shownAll(countsByIndustry)}件
+                  </span>
+                </span>
               </button>
-              {industries.map((group) => (
+
+              {industries.map((group) => {
+                const count = countsByIndustry[group.id];
+                const isActive = industry === group.id;
+
+                return (
+                  <button
+                    key={group.id}
+                    type="button"
+                    className={styles.tile}
+                    data-active={isActive ? "true" : "false"}
+                    data-empty={count === 0 ? "true" : "false"}
+                    aria-pressed={isActive}
+                    onClick={() => setIndustry(isActive ? "all" : group.id)}
+                  >
+                    <span className={styles.tileImage}>
+                      <Image
+                        src={group.image}
+                        alt=""
+                        fill
+                        sizes={TILE_SIZES}
+                        placeholder="blur"
+                      />
+                    </span>
+                    <span className={styles.tileMeta}>
+                      <span className={styles.tileName}>{group.name}</span>
+                      <span className={`mono ${styles.tileCount}`}>{count}件</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </Reveal>
+      </div>
+
+      {/* 絞り込みバー ---------------------------------------------------- */}
+      <div ref={barRef} className={styles.filterBar}>
+        <div className={`shell ${styles.filterInner}`}>
+          <div className={styles.filterGroup}>
+            <span className={`mono ${styles.filterLegend}`}>分野</span>
+            <div
+              className={styles.segmented}
+              role="group"
+              aria-label="分野で絞り込む"
+            >
+              <button
+                type="button"
+                className={styles.segment}
+                data-active={discipline === "all" ? "true" : "false"}
+                aria-pressed={discipline === "all"}
+                onClick={() => setDiscipline("all")}
+              >
+                すべて
+              </button>
+              {disciplineOrder.map((key) => (
                 <button
-                  key={group.id}
+                  key={key}
                   type="button"
-                  className={styles.chip}
-                  data-active={industry === group.id ? "true" : "false"}
-                  aria-pressed={industry === group.id}
-                  onClick={() => setIndustry(group.id)}
+                  className={styles.segment}
+                  data-active={discipline === key ? "true" : "false"}
+                  aria-pressed={discipline === key}
+                  onClick={() => setDiscipline(key)}
                 >
-                  {group.name}
+                  {disciplineShortLabels[key]}
                 </button>
               ))}
             </div>
           </div>
+
+          {selectedIndustry ? (
+            <button
+              type="button"
+              className={styles.selected}
+              onClick={() => setIndustry("all")}
+              aria-label={`業種の絞り込み「${selectedIndustry.name}」を解除する`}
+            >
+              <span className={styles.selectedThumb} aria-hidden="true">
+                <Image
+                  src={selectedIndustry.image}
+                  alt=""
+                  fill
+                  sizes="28px"
+                  placeholder="blur"
+                />
+              </span>
+              <span className={styles.selectedName}>{selectedIndustry.name}</span>
+              <span className={styles.selectedClear} aria-hidden="true">
+                ×
+              </span>
+            </button>
+          ) : null}
+
+          <p className={`mono ${styles.count}`} role="status">
+            <span className={styles.countValue}>
+              {String(shown).padStart(2, "0")}
+            </span>
+            {/* 画面が狭いときは表記を短くし、バーが収まるようにしています。 */}
+            <span className={`${styles.countLabel} ${styles.countLong}`}>
+              件（全{totalProjects}件）
+            </span>
+            <span className={`${styles.countLabel} ${styles.countShort}`}>
+              / {totalProjects}
+            </span>
+            {isFiltered ? (
+              <button type="button" className={styles.reset} onClick={resetFilters}>
+                解除
+              </button>
+            ) : null}
+          </p>
         </div>
       </div>
 
-      {/* Records ------------------------------------------------------- */}
+      {/* 一覧 ------------------------------------------------------------ */}
       <div className="shell">
         {groups.length === 0 ? (
           <p className={styles.empty}>
@@ -269,6 +332,15 @@ export function ProjectRecords() {
               <Reveal key={group.id} delay={Math.min(groupIndex, 4) * 60}>
                 <article className={styles.group}>
                   <header className={styles.groupHead}>
+                    <span className={styles.groupImage}>
+                      <Image
+                        src={group.image}
+                        alt=""
+                        fill
+                        sizes="(max-width: 1080px) 72px, 104px"
+                        placeholder="blur"
+                      />
+                    </span>
                     <h3 className={`display ${styles.groupTitle}`}>{group.name}</h3>
                     <p className={styles.groupNote}>{group.note}</p>
                     <span className={`mono ${styles.groupCount}`}>
@@ -279,9 +351,7 @@ export function ProjectRecords() {
                   <ol className={styles.rows}>
                     {group.projects.map((project) => (
                       <li key={project.id} className={styles.row}>
-                        <span className={`mono ${styles.rowIndex}`}>
-                          {project.id}
-                        </span>
+                        <span className={`mono ${styles.rowIndex}`}>{project.id}</span>
 
                         <div className={styles.rowBody}>
                           <h4 className={`display ${styles.rowTitle}`}>
@@ -324,4 +394,9 @@ export function ProjectRecords() {
       </div>
     </section>
   );
+}
+
+/** 「すべての業種」タイルに出す、分野の絞り込みを反映した合計件数。 */
+function shownAll(counts: Record<string, number>): number {
+  return Object.values(counts).reduce((total, count) => total + count, 0);
 }

@@ -1,3 +1,22 @@
+import type { StaticImageData } from "next/image";
+
+import imgAll from "@/images/industries/all.png";
+import imgAgriculture from "@/images/industries/agriculture.png";
+import imgManufacturing from "@/images/industries/manufacturing.png";
+import imgRetail from "@/images/industries/retail.png";
+import imgHealthcare from "@/images/industries/healthcare.png";
+import imgCare from "@/images/industries/care.png";
+import imgGovernment from "@/images/industries/government.png";
+import imgEducation from "@/images/industries/education.png";
+import imgFinance from "@/images/industries/finance.png";
+import imgLogistics from "@/images/industries/logistics.png";
+import imgProperty from "@/images/industries/property.png";
+import imgEnergy from "@/images/industries/energy.png";
+import imgOperations from "@/images/industries/operations.png";
+import imgMedia from "@/images/industries/media.png";
+import imgSecurity from "@/images/industries/security.png";
+import imgResearch from "@/images/industries/research.png";
+
 /**
  * 開発実績のデータ。
  *
@@ -22,6 +41,8 @@ export type IndustryGroup = {
   name: string;
   /** その業種で担当した仕事の概要。 */
   note: string;
+  /** 業種を表すイラスト。業種名は画像の中に入っています。 */
+  image: StaticImageData;
   projects: Project[];
 };
 
@@ -48,6 +69,7 @@ export const disciplineOrder: Discipline[] = ["system", "app", "ai"];
 export const industries: IndustryGroup[] = [
   {
     id: "agriculture",
+    image: imgAgriculture,
     name: "農林水産業",
     note: "ハウスの中から出荷先まで、現場の動きをひと続きのデータに。",
     projects: [
@@ -83,6 +105,7 @@ export const industries: IndustryGroup[] = [
   },
   {
     id: "manufacturing",
+    image: imgManufacturing,
     name: "製造業",
     note: "実際の生産現場の負荷のなかでも、数字が狂わない仕組みを。",
     projects: [
@@ -112,6 +135,7 @@ export const industries: IndustryGroup[] = [
   },
   {
     id: "retail",
+    image: imgRetail,
     name: "小売・EC・飲食",
     note: "店舗、決済、バックヤードを、ひとつの在庫と数字でつなぐ。",
     projects: [
@@ -157,6 +181,7 @@ export const industries: IndustryGroup[] = [
   },
   {
     id: "healthcare",
+    image: imgHealthcare,
     name: "医療・ヘルスケア",
     note: "診療科ごとの実務に合わせて設計し、監査にも耐える構成で。",
     projects: [
@@ -196,6 +221,7 @@ export const industries: IndustryGroup[] = [
   },
   {
     id: "care",
+    image: imgCare,
     name: "介護・福祉",
     note: "机の前ではなく、忙しい手もとと短い時間のための道具を。",
     projects: [
@@ -231,6 +257,7 @@ export const industries: IndustryGroup[] = [
   },
   {
     id: "government",
+    image: imgGovernment,
     name: "行政・公共",
     note: "アクセシビリティ、セキュリティ、調達要件を満たした公共サービス。",
     projects: [
@@ -264,6 +291,7 @@ export const industries: IndustryGroup[] = [
   },
   {
     id: "education",
+    image: imgEducation,
     name: "教育",
     note: "先生方とご一緒に、無理のない進め方で導入を。",
     projects: [
@@ -289,6 +317,7 @@ export const industries: IndustryGroup[] = [
   },
   {
     id: "finance",
+    image: imgFinance,
     name: "金融・保険",
     note: "規制対応を前提に、外部監査にも耐える記録を残す設計で。",
     projects: [
@@ -321,6 +350,7 @@ export const industries: IndustryGroup[] = [
   },
   {
     id: "logistics",
+    image: imgLogistics,
     name: "物流・運輸・モビリティ",
     note: "実際のドライバー、道路事情、積み方に合う計画を。",
     projects: [
@@ -346,6 +376,7 @@ export const industries: IndustryGroup[] = [
   },
   {
     id: "property",
+    image: imgProperty,
     name: "不動産・建設",
     note: "契約、現場、建物を、ひとつの確かな記録に。",
     projects: [
@@ -371,6 +402,7 @@ export const industries: IndustryGroup[] = [
   },
   {
     id: "energy",
+    image: imgEnergy,
     name: "エネルギー・環境",
     note: "まず測ること。次に予測。そして、通る報告を。",
     projects: [
@@ -398,6 +430,7 @@ export const industries: IndustryGroup[] = [
   },
   {
     id: "operations",
+    image: imgOperations,
     name: "バックオフィス・経営管理",
     note: "社内の地道な業務に、時間をお返しする仕組みを。",
     projects: [
@@ -453,6 +486,7 @@ export const industries: IndustryGroup[] = [
   },
   {
     id: "media",
+    image: imgMedia,
     name: "メディア・エンタメ・スポーツ",
     note: "キャンペーン時の急なアクセス増が、前提となる規模のサービス。",
     projects: [
@@ -495,6 +529,7 @@ export const industries: IndustryGroup[] = [
   },
   {
     id: "security",
+    image: imgSecurity,
     name: "セキュリティ・インフラ",
     note: "ほかのすべてが止まった日にも、動き続ける層を。",
     projects: [
@@ -520,6 +555,7 @@ export const industries: IndustryGroup[] = [
   },
   {
     id: "research",
+    image: imgResearch,
     name: "研究・科学・分野横断AI",
     note: "研究水準の処理を、本番運用に耐える品質で。",
     projects: [
@@ -566,6 +602,9 @@ export const industries: IndustryGroup[] = [
     ],
   },
 ];
+
+/** 「すべての業種」を表すイラスト。 */
+export const allIndustriesImage = imgAll;
 
 export const allProjects: Project[] = industries.flatMap((group) => group.projects);
 
