@@ -3,7 +3,7 @@
   inset-inline: 0;
   top: 0;
   z-index: 6;
-  padding-block: clamp(18px, 2.6vw, 30px);
+  padding-block: clamp(16px, 2.4vw, 26px);
 }
 
 .inner {
@@ -19,30 +19,31 @@
   gap: 14px;
 }
 
-.monogram {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--rule-strong);
-  font-family: var(--font-display), sans-serif;
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  line-height: 1;
-  color: var(--ink);
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(6px);
+/* ロゴ。丸みのある枠に収めています。 */
+.logo {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--white);
   transition:
-    background 0.35s var(--ease-soft),
-    color 0.35s var(--ease-soft),
-    border-color 0.35s var(--ease-soft);
+    border-color 0.35s var(--ease-soft),
+    box-shadow 0.35s var(--ease-soft),
+    transform 0.45s var(--ease);
 }
 
-.mark:hover .monogram {
-  background: var(--ink);
-  color: var(--white);
-  border-color: var(--ink);
+.logo img {
+  object-fit: cover;
+}
+
+.mark:hover .logo {
+  border-color: var(--rule-strong);
+  box-shadow: 0 4px 16px rgba(11, 11, 11, 0.09);
+  transform: translateY(-1px);
 }
 
 .wordmark {
@@ -69,6 +70,12 @@
 @media (max-width: 720px) {
   .wordmark {
     display: none;
+  }
+
+  .logo {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
   }
 
   .meta {

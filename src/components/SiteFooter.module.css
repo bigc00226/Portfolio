@@ -19,18 +19,20 @@
   color: var(--text-mute);
 }
 
-.monogram {
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border: 1px solid var(--rule);
-  font-family: var(--font-display), sans-serif;
-  font-size: 0.625rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  line-height: 1;
-  color: var(--text-dim);
+.logo {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  overflow: hidden;
+  border: 1px solid var(--rule-faint);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+}
+
+.logo img {
+  object-fit: cover;
 }
 
 .top {

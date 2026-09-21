@@ -1,4 +1,7 @@
+import Image from "next/image";
+
 import { site } from "@/data/site";
+import logo from "@/images/logo.png";
 
 import styles from "./SiteFooter.module.css";
 
@@ -7,8 +10,8 @@ export function SiteFooter() {
     <footer className={styles.footer}>
       <div className={`shell ${styles.inner}`}>
         <p className={`mono ${styles.line}`}>
-          <span className={styles.monogram} aria-hidden="true">
-            {site.monogram}
+          <span className={styles.logo}>
+            <Image src={logo} alt="" fill sizes="34px" />
           </span>
           {site.name}
         </p>

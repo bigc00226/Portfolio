@@ -220,8 +220,9 @@
 .scrollRail {
   position: relative;
   display: block;
-  width: 1px;
+  width: 2px;
   height: 34px;
+  border-radius: var(--radius-pill);
   background: var(--rule);
   overflow: hidden;
 }
@@ -254,21 +255,24 @@
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  padding: 9px 15px;
+  padding: 9px 17px;
   border: 1px solid var(--rule);
+  border-radius: var(--radius-pill);
   color: var(--text-dim);
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(8px);
   transition:
     color 0.3s var(--ease-soft),
     border-color 0.3s var(--ease-soft),
-    background 0.3s var(--ease-soft);
+    background 0.3s var(--ease-soft),
+    box-shadow 0.3s var(--ease-soft);
 }
 
 .control:hover {
   color: var(--white);
   background: var(--ink);
   border-color: var(--ink);
+  box-shadow: 0 6px 18px rgba(11, 11, 11, 0.16);
 }
 
 .controlIcon {

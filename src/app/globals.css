@@ -28,6 +28,14 @@
   --gutter: clamp(20px, 4.4vw, 72px);
   --max: 1460px;
 
+  /* 角の丸み */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
   /* 動き */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
@@ -107,6 +115,7 @@ a {
 :focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
+  border-radius: var(--radius-xs);
 }
 
 ::selection {
@@ -180,6 +189,7 @@ a {
   left: 10px;
   z-index: 100;
   padding: 12px 18px;
+  border-radius: var(--radius-pill);
   background: var(--ink);
   color: var(--white);
   font-size: 0.8125rem;
