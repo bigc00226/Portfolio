@@ -83,9 +83,15 @@ export const viewport: Viewport = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  /*
+   * data-scroll-behavior は、ページを移るときだけ、なめらかなスクロールを
+   * 止めるための指定です。/ と /home を行き来するたびに長い距離を流れて
+   * しまわないようにしています。ページ内のリンクは、これまでどおり動きます。
+   */
   return (
     <html
       lang="ja"
+      data-scroll-behavior="smooth"
       className={`${display.variable} ${sans.variable} ${mono.variable} ${japanese.variable}`}
     >
       <body>

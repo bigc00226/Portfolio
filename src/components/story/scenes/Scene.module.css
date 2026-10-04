@@ -1,0 +1,775 @@
+/* =========================================================================
+   物語の絵
+   白い紙に、黒いインクだけで描いています。座標は 1200 × 800 の画面で、
+   地面は y = 660。どの画面幅でも中央の 800 × 800 は必ず映ります。
+
+   ここに書いてある「そのままの見た目」が、各章の仕上がった絵です。
+   JavaScript を無効にしている方と、「視差効果を減らす」設定の方には、
+   この絵をそのままお見せします。上映中だけ、下のほうにあるアニメーションが、
+   白紙からこの絵まで運びます。
+   ========================================================================= */
+
+.scene {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* 線と面 ----------------------------------------------------------------- */
+
+.line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.paper {
+  fill: var(--white);
+  stroke: var(--ink);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ink {
+  fill: var(--ink);
+}
+
+.white {
+  fill: var(--white);
+}
+
+.tone {
+  fill: #ebebea;
+}
+
+.toneDark {
+  fill: #d4d4d3;
+}
+
+.thin {
+  stroke-width: 2.5;
+}
+
+.hair {
+  stroke-width: 1.5;
+}
+
+.soft {
+  stroke: rgba(11, 11, 11, 0.3);
+}
+
+.dashed {
+  stroke-dasharray: 2 12;
+}
+
+.whiteLine {
+  fill: none;
+  stroke: var(--white);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 文字 ------------------------------------------------------------------- */
+
+.text {
+  fill: var(--ink);
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-family: var(--font-jp), var(--font-sans), sans-serif;
+  font-weight: 700;
+  font-feature-settings: "palt" 1;
+}
+
+.sign {
+  font-family: var(--font-display), var(--font-jp), sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.code {
+  font-family: var(--font-mono), ui-monospace, Menlo, monospace;
+  font-weight: 500;
+}
+
+.start {
+  text-anchor: start;
+}
+
+.onInk {
+  fill: var(--white);
+}
+
+.onInkDim {
+  fill: rgba(255, 255, 255, 0.42);
+}
+
+.end {
+  text-anchor: end;
+}
+
+.mute {
+  fill: rgba(11, 11, 11, 0.45);
+}
+
+/* 人物 -------------------------------------------------------------------
+   黒い体に、白いふちどり。手足が体に重なっても、形が読み取れます。 */
+
+.fig {
+  fill: var(--fig-fill, var(--ink));
+  stroke: var(--fig-line, var(--white));
+  stroke-width: 5;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+/*
+ * 腕と脚は、いくつかの形をつないで一本にしています。ふちどりを先にまとめて
+ * 描き、その上に中身を重ねることで、ひじや足首に継ぎ目の線が出ません。
+ */
+.figEdge {
+  fill: var(--fig-line, var(--white));
+  stroke: var(--fig-line, var(--white));
+  stroke-width: 5;
+  stroke-linejoin: round;
+}
+
+.figFill {
+  fill: var(--fig-fill, var(--ink));
+}
+
+.face {
+  fill: var(--fig-face, var(--white));
+}
+
+.faceLine {
+  fill: none;
+  stroke: var(--fig-face, var(--white));
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.faceRing {
+  fill: none;
+  stroke: var(--fig-face, var(--white));
+  stroke-width: 3.2;
+}
+
+/* 仲間やお客様は、淡い色の人物として描き分けます。 */
+.ghost {
+  --fig-fill: #e6e6e5;
+  --fig-line: var(--ink);
+  --fig-face: var(--ink);
+}
+
+.ghost .fig,
+.ghost .figEdge {
+  stroke-width: 6;
+}
+
+/* 仕上がった絵では隠れているもの。上映中は、途中で消えていきます。 */
+.out,
+.blink {
+  opacity: 0;
+}
+
+/* 文字を隠しておく覆い。右へ縮んで、文字を一字ずつ見せます。 */
+.wipe {
+  transform: scaleX(0);
+  transform-box: fill-box;
+  transform-origin: 100% 50%;
+}
+
+/* 形の中心や下端を軸にして、大きさを変えるもの。 */
+.pop,
+.spin,
+.pulse {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+.grow,
+.popUp,
+.sway {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.growX {
+  transform-box: fill-box;
+  transform-origin: 0% 50%;
+}
+
+.hang {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+}
+
+.draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+/* 上映 -------------------------------------------------------------------
+   アニメーションはどれも長さ 1 秒で、止めたままにしてあります。
+   どこまで再生したところを見せるかは、StoryFilm.tsx がスクロール位置から
+   決めて、要素ごとに送ります。 */
+
+[data-story-mode="cinema"] .scene * {
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-iteration-count: 1;
+  animation-play-state: paused;
+}
+
+/* 地面の線は、舞台が画面の端から端まで引いています。 */
+[data-story-mode="cinema"] .groundLine {
+  display: none;
+}
+
+[data-story-mode="cinema"] .in {
+  animation-name: storyIn;
+}
+
+[data-story-mode="cinema"] .move {
+  animation-name: storyMove;
+}
+
+[data-story-mode="cinema"] .walk {
+  animation-name: storyWalk;
+}
+
+[data-story-mode="cinema"] .fade {
+  animation-name: storyFade;
+}
+
+[data-story-mode="cinema"] .out {
+  animation-name: storyOut;
+}
+
+[data-story-mode="cinema"] .pop,
+[data-story-mode="cinema"] .popUp {
+  animation-name: storyPop;
+}
+
+[data-story-mode="cinema"] .grow {
+  animation-name: storyGrow;
+}
+
+[data-story-mode="cinema"] .growX {
+  animation-name: storyGrowX;
+}
+
+[data-story-mode="cinema"] .draw {
+  animation-name: storyDraw;
+}
+
+[data-story-mode="cinema"] .drop {
+  animation-name: storyDrop;
+}
+
+[data-story-mode="cinema"] .turn {
+  animation-name: storyTurn;
+}
+
+[data-story-mode="cinema"] .lift {
+  animation-name: storyLift;
+}
+
+[data-story-mode="cinema"] .shift {
+  animation-name: storyShift;
+}
+
+[data-story-mode="cinema"] .blink {
+  animation-name: storyBlink;
+}
+
+[data-story-mode="cinema"] .away {
+  animation-name: storyAway;
+}
+
+[data-story-mode="cinema"] .wipe {
+  animation-name: storyWipe;
+}
+
+/* くり返す動き。--n が回数です。 */
+[data-story-mode="cinema"] .stepA,
+[data-story-mode="cinema"] .stepB,
+[data-story-mode="cinema"] .bob,
+[data-story-mode="cinema"] .swingA,
+[data-story-mode="cinema"] .swingB,
+[data-story-mode="cinema"] .wave,
+[data-story-mode="cinema"] .hop,
+[data-story-mode="cinema"] .sway,
+[data-story-mode="cinema"] .hang,
+[data-story-mode="cinema"] .pulse,
+[data-story-mode="cinema"] .spin {
+  animation-duration: calc(1s / var(--n, 4));
+  animation-iteration-count: var(--n, 4);
+}
+
+[data-story-mode="cinema"] .stepA {
+  animation-name: storyStepA;
+}
+
+[data-story-mode="cinema"] .stepB {
+  animation-name: storyStepB;
+}
+
+[data-story-mode="cinema"] .bob {
+  animation-name: storyBob;
+}
+
+[data-story-mode="cinema"] .swingA {
+  animation-name: storySwingA;
+}
+
+[data-story-mode="cinema"] .swingB {
+  animation-name: storySwingB;
+}
+
+[data-story-mode="cinema"] .wave {
+  animation-name: storyWave;
+}
+
+[data-story-mode="cinema"] .hop {
+  animation-name: storyHop;
+}
+
+[data-story-mode="cinema"] .sway,
+[data-story-mode="cinema"] .hang {
+  animation-name: storySway;
+}
+
+[data-story-mode="cinema"] .pulse {
+  animation-name: storyPulse;
+}
+
+[data-story-mode="cinema"] .spin {
+  animation-name: storySpin;
+}
+
+/* 場面ごとの、決まった道すじをたどる動き。 */
+[data-story-mode="cinema"] .cursorDesign {
+  animation-name: storyCursorDesign;
+}
+
+[data-story-mode="cinema"] .sunArc {
+  animation-name: storySunArc;
+}
+
+[data-story-mode="cinema"] .flight {
+  animation-name: storyFlight;
+}
+
+/*
+ * どの動きも、終わりの形は「そのままの見た目」と同じです。
+ *
+ * 終わりの形は、省かずに必ず書いています。省くとブラウザが補ってくれますが、
+ * WebKit（Safari）では、章を映し始めた瞬間に、補った形が動き始めの形で
+ * 上書きされ、絵が現れないままになります。
+ */
+
+@keyframes storyIn {
+  from {
+    opacity: 0;
+    transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(var(--dr, 0deg))
+      scale(var(--ds, 1));
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0px, 0px) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes storyMove {
+  from {
+    transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(var(--dr, 0deg))
+      scale(var(--ds, 1));
+    animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+  }
+  to {
+    transform: translate(0px, 0px) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes storyWalk {
+  from {
+    transform: translate(var(--dx, 0px), var(--dy, 0px));
+  }
+  to {
+    transform: translate(0px, 0px);
+  }
+}
+
+@keyframes storyFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes storyOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes storyPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+    animation-timing-function: cubic-bezier(0.3, 0.7, 0.4, 1);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.14);
+    animation-timing-function: ease-in-out;
+  }
+  80% {
+    opacity: 1;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes storyGrow {
+  from {
+    transform: scaleY(0);
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes storyGrowX {
+  from {
+    transform: scaleX(0);
+    animation-timing-function: cubic-bezier(0.3, 0.6, 0.3, 1);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes storyDraw {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 1;
+  }
+  4% {
+    opacity: 1;
+    stroke-dashoffset: 0.96;
+  }
+  100% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes storyDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(var(--dy, -140px));
+    animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.6);
+  }
+  12% {
+    opacity: 1;
+    transform: translateY(calc(var(--dy, -140px) * 0.94));
+    animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.6);
+  }
+  58% {
+    opacity: 1;
+    transform: translateY(0px);
+    animation-timing-function: ease-out;
+  }
+  76% {
+    opacity: 1;
+    transform: translateY(calc(var(--dy, -140px) * 0.12));
+    animation-timing-function: ease-in;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+/* 腕などを、傾けた姿勢から仕上がりの姿勢へ回します。 */
+@keyframes storyTurn {
+  from {
+    transform: rotate(var(--dr, 0deg));
+    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+/* いったん上げて、また下ろす。 */
+@keyframes storyLift {
+  0%,
+  100% {
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
+  }
+  16%,
+  84% {
+    transform: rotate(var(--dr, 0deg));
+    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
+  }
+}
+
+/* いったんずらして、また戻す（視線など）。 */
+@keyframes storyShift {
+  0%,
+  100% {
+    transform: translate(0px, 0px);
+    animation-timing-function: ease-in-out;
+  }
+  14%,
+  86% {
+    transform: translate(var(--dx, 0px), var(--dy, 0px));
+    animation-timing-function: ease-in-out;
+  }
+}
+
+/* 区間のあいだだけ現れる。 */
+@keyframes storyBlink {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  14%,
+  86% {
+    opacity: 1;
+  }
+}
+
+/* 区間のあいだだけ姿を消す。 */
+@keyframes storyAway {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  10%,
+  90% {
+    opacity: 0;
+  }
+}
+
+@keyframes storyWipe {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes storyStepA {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(25deg);
+  }
+  75% {
+    transform: rotate(-25deg);
+  }
+}
+
+@keyframes storyStepB {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-25deg);
+  }
+  75% {
+    transform: rotate(25deg);
+  }
+}
+
+@keyframes storyBob {
+  0%,
+  50%,
+  100% {
+    transform: translateY(0);
+  }
+  25%,
+  75% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes storySwingA {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-16deg);
+  }
+  75% {
+    transform: rotate(16deg);
+  }
+}
+
+@keyframes storySwingB {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(16deg);
+  }
+  75% {
+    transform: rotate(-16deg);
+  }
+}
+
+@keyframes storyWave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(var(--dr, 34deg));
+  }
+}
+
+@keyframes storyHop {
+  0%,
+  100% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+  45% {
+    transform: translateY(var(--dy, -34px));
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+}
+
+@keyframes storySway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(var(--dr, 7deg));
+  }
+  75% {
+    transform: rotate(calc(var(--dr, 7deg) * -1));
+  }
+}
+
+@keyframes storyPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(var(--ds, 1.16));
+  }
+}
+
+@keyframes storySpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 第6章：デザインの部品を、順に置いていくカーソル。 */
+@keyframes storyCursorDesign {
+  0% {
+    transform: translate(-410px, -262px);
+    animation-timing-function: ease-in-out;
+  }
+  14% {
+    transform: translate(-310px, -210px);
+    animation-timing-function: ease-in-out;
+  }
+  30% {
+    transform: translate(-310px, -140px);
+    animation-timing-function: ease-in-out;
+  }
+  46% {
+    transform: translate(-355px, -80px);
+    animation-timing-function: ease-in-out;
+  }
+  64% {
+    transform: translate(-87px, -146px);
+    animation-timing-function: ease-in-out;
+  }
+  84% {
+    transform: translate(-209px, -22px);
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    transform: translate(0px, 0px);
+  }
+}
+
+/* 第8章：朝から夜へ、空を渡る太陽。 */
+@keyframes storySunArc {
+  0% {
+    transform: translate(-280px, 0px);
+  }
+  25% {
+    transform: translate(-222px, -82px);
+  }
+  50% {
+    transform: translate(-140px, -112px);
+  }
+  75% {
+    transform: translate(-58px, -82px);
+  }
+  100% {
+    transform: translate(0px, 0px);
+  }
+}
+
+/* 第9章：飛び立ち、海を越えていく飛行機。 */
+@keyframes storyFlight {
+  0% {
+    transform: translate(-428px, 434px) rotate(0deg);
+    animation-timing-function: ease-in;
+  }
+  14% {
+    transform: translate(-370px, 418px) rotate(-18deg);
+  }
+  38% {
+    transform: translate(-282px, 268px) rotate(-42deg);
+  }
+  62% {
+    transform: translate(-164px, 110px) rotate(-34deg);
+  }
+  84% {
+    transform: translate(-58px, 20px) rotate(-14deg);
+    animation-timing-function: ease-out;
+  }
+  100% {
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+}
