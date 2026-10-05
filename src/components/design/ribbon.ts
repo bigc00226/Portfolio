@@ -15,82 +15,94 @@ import {
 } from "three";
 
 /**
- * 写真の帯を、3D の空間で走らせます。
+ * 写真の帯を、輪（円軌道）に沿って走らせます。
  *
- * 帯は、縦に立てた大きな筒に、らせん状に巻きついています。筒が回りながら
- * 奥から近づき、やがて遠ざかるので、写真は左下の奥から現れ、手前を大きく
- * 横切り、右端で裏へ回って、文字の後ろを遠ざかっていきます。
+ * 帯は、縦に立てた大きな輪の上を一周します。輪のいちばん奥で現れ、奥側を
+ * 小さく左へ流れ、左端で折り返して、手前を大きく右へ横切り、右端でもう一度
+ * 折り返して、奥側を流れながら、いちばん奥で消えていきます。
+ * スクロールが進むにつれて、輪そのものも画面の下から上へ昇っていきます。
  *
  * 見出しの文字は HTML のままなので、帯を「文字より奥」と「文字より手前」の
- * 二枚のキャンバスに描き分け、文字をそのあいだに挟んでいます。
- * 奥行き 0 の面が、文字のある位置です。
+ * 二枚のキャンバスに描き分け、文字をそのあいだに挟んでいます。輪の中心は
+ * 文字の面（奥行き 0）にあり、手前の半分だけが文字の前を通ります。
  *
  * 長さの単位は CSS ピクセルで、奥行き 0 の面では画面上の大きさと一致します。
  */
 
-/** カメラの画角（縦）。 */
-const FOV = 30;
 /** 一枚の写真を曲げるための分割数。 */
 const SEGMENTS = 24;
 /** 一枚の横と縦の比。 */
-const FRAME_RATIO = 1.5;
-/** 写真と写真のすきま（帯の高さに対する割合）。 */
-const GAP = 0.045;
-
+const FRAME_RATIO = 16 / 9;
 /** 帯に並べる枚数。画像が足りない分は、先頭からくり返して並べます。 */
-const COUNT = 12;
-
-/** 筒の半径と、帯の高さ（どちらも、画面の高さを 1 とした値）。 */
-const RADIUS = 1.7;
-const BAND = 0.38;
-/** らせんの上がり方。筒を一ラジアン回るごとに、これだけ上がります。 */
-const RISE = 0.07;
+const COUNT = 10;
 
 /**
- * 帯が見えるのは、筒の左手前から、裏側の中ほどまで。その外では薄れて消えます。
- * 角度は、筒の正面（いちばん手前）を 0、右まわりをプラスとしたラジアンです。
+ * 輪の半径と、写真の高さ。どちらも「基準の長さ」を 1 とした値です。
+ * 基準の長さは、横長の画面では画面の高さ、縦長の画面では画面の幅の 8 割です。
  */
-const ENTER = -1.0;
-const LEAVE = 2.9;
+const RADIUS = 0.973;
+const FRAME_HEIGHT = 0.2925;
+/** 視点から文字の面までの距離（基準の長さが単位）。大きくするほど、遠近が弱まります。 */
+const DISTANCE = 1.866;
+
+/** 写真一枚が輪の上で占める角度と、となりの写真までの角度（ラジアン）。 */
+const FRAME_ANGLE = (FRAME_HEIGHT * FRAME_RATIO) / RADIUS;
+const STEP = FRAME_ANGLE + 0.0096;
 
 /**
- * 進み具合ごとの、筒の置き方。あいだは、なめらかにつなぎます。
+ * 輪のいちばん奥にある継ぎ目。帯はここで現れ、ここで消えます。
+ * 角度は、輪のいちばん手前を 0、右まわりをプラスとしたラジアンです。
+ */
+const SEAM_IN: readonly [number, number] = [-Math.PI - 0.13, -Math.PI - 0.01];
+const SEAM_OUT: readonly [number, number] = [Math.PI - 0.16, Math.PI + 0.06];
+
+/**
+ * 帯の先頭が輪のどこにいるか。進み具合 0 のときの角度と、進み具合が 1 進む
+ * あいだに回る角度です。帯は、スクロールに対していつも同じ速さで回ります。
+ */
+const HEAD_START = -0.05;
+const TURN = 6.57;
+
+/**
+ * 進み具合ごとの、輪の置き方。あいだは、なめらかにつなぎます。
+ * 進み具合は、画面を固定しているあいだが 0〜1。固定が外れたあとも続きます。
  *
- * [進み具合, 横位置, 縦位置, 大きさ, 先頭の角度, 傾き, 見下ろし]
- * - 横位置と縦位置は、筒の正面が画面のどこに来るか（中心が 0、端が ±1）。
- * - 大きさは、正面の写真が何倍に見えるか。1 で、文字と同じ面にあります。
- * - 先頭の角度は、帯の先頭が筒のどこまで回ったか。
- * - 傾きは筒を画面の中で倒す角度で、プラスが右上がり。
- *   見下ろしは筒を上から見こむ角度です（どちらもラジアン）。
+ * [進み具合, 横位置, 縦位置, 傾き, 見下ろし, すぼまり]
+ * - 横位置は輪の中心（基準の長さが単位）、縦位置は画面の高さが単位。
+ *   どちらも画面の中心が 0 で、右と上がプラスです。
+ * - 傾きは、輪を画面の中で倒す角度。プラスで右上がり。
+ * - 見下ろしは、輪の奥側を持ち上げる角度。プラスで、上から見こむ形になります。
+ * - すぼまりは、帯の上の縁と下の縁の半径の差を角度にしたもの。マイナスで、
+ *   上の縁が内側へ入ります（角度はどれも度）。
  */
 const KEYS: readonly (readonly number[])[] = [
-  [0.0, -0.45, -0.72, 0.5, 0.53, 0.2, 0.06],
-  [0.14, 0.3, -0.78, 1.7, 1.05, 0.15, 0.06],
-  [0.27, 0.35, -0.74, 1.72, 1.4, 0.13, 0.06],
-  [0.4, 0.4, -0.5, 1.75, 1.95, 0.08, 0.06],
-  [0.52, 0.3, -0.36, 1.78, 2.6, 0.06, 0.06],
-  [0.66, 0.5, -0.05, 1.65, 3.6, 0.02, 0.06],
-  [0.75, 0.62, 0.16, 1.5, 4.0, 0.0, 0.06],
-  [0.87, 0.62, 0.2, 1.4, 5.3, 0.0, 0.06],
-  [1.0, 0.62, 0.25, 1.3, 6.6, 0.0, 0.06],
+  [0.0, -0.135, -0.403, 11.0, -3.8, -39.0],
+  [0.0304, -0.124, -0.375, 11.0, -4.1, -28.0],
+  [0.0578, -0.112, -0.353, 10.6, -4.4, -20.0],
+  [0.1339, -0.062, -0.255, 10.4, -3.2, -13.0],
+  [0.2892, -0.015, -0.169, 8.3, -2.0, -7.0],
+  [0.4673, 0.05, -0.045, 5.6, -1.9, -0.4],
+  [0.6362, 0.01, -0.012, 3.4, 1.4, 6.0],
+  [0.8417, 0.04, 0.103, 0.4, 4.9, 20.0],
+  [1.0654, -0.146, 0.253, -7.5, 3.0, 14.0],
+  [1.53, -0.3, 0.5, -14.0, 2.0, 10.0],
 ];
 
+/** 読みこみ直後、帯が回りこんできて位置につくまでの時間（ミリ秒）。 */
+const INTRO = 2000;
+/** そのとき、帯をどれだけ戻した位置から回しはじめるか（ラジアン）。 */
+const INTRO_TURN = 1.5;
+
 const VERTEX = /* glsl */ `
-  uniform float uLead;
-  uniform float uLength;
-  uniform float uHeadAngle;
-  uniform float uArc;
+  attribute float angle;
 
   varying vec2 vUv;
-  varying float vHead;
   varying float vAngle;
   varying float vDepth;
 
   void main() {
     vUv = uv;
-    // 帯の先頭からの距離と、筒の上での角度。
-    vHead = uLead + (1.0 - uv.x) * uLength;
-    vAngle = uHeadAngle - vHead / uArc;
+    vAngle = angle;
     vDepth = position.z;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
@@ -101,13 +113,10 @@ const FRAGMENT = /* glsl */ `
   uniform vec2 uCover;
   uniform vec3 uTone;
   uniform float uLoaded;
-  uniform float uFade;
-  uniform float uEnter;
-  uniform float uLeave;
+  uniform vec4 uSeam;
   uniform float uSide;
 
   varying vec2 vUv;
-  varying float vHead;
   varying float vAngle;
   varying float vDepth;
 
@@ -115,14 +124,13 @@ const FRAGMENT = /* glsl */ `
     // 文字の面より手前か奥か。担当でないほうは描きません。
     if (uSide > 0.0 ? vDepth < 0.0 : vDepth >= 0.0) discard;
 
-    // 先頭は薄く。筒の裏から回ってくるところと、裏へ消えていくところも薄く。
-    float alpha = smoothstep(0.0, uFade, vHead)
-      * smoothstep(uEnter - 0.55, uEnter, vAngle)
-      * (1.0 - smoothstep(uLeave, uLeave + 0.6, vAngle));
+    // 輪のいちばん奥の継ぎ目では、薄れて消えます。
+    float alpha = smoothstep(uSeam.x, uSeam.y, vAngle)
+      * (1.0 - smoothstep(uSeam.z, uSeam.w, vAngle));
     if (alpha < 0.004) discard;
 
     vec2 uv = vUv;
-    // 裏へ回ったあとは帯を裏から見ることになるので、左右を戻します。
+    // 奥側では帯を裏から見ることになるので、左右を戻します。
     if (!gl_FrontFacing) uv.x = 1.0 - uv.x;
     uv = (uv - 0.5) * uCover + 0.5;
 
@@ -134,15 +142,23 @@ const FRAGMENT = /* glsl */ `
 type Frame = {
   mesh: Mesh<BufferGeometry, ShaderMaterial>;
   positions: Float32Array;
-  attribute: BufferAttribute;
+  angles: Float32Array;
+  position: BufferAttribute;
+  angle: BufferAttribute;
 };
 
 export type Ribbon = {
   resize: (width: number, height: number) => void;
-  /** 進み具合（0〜1）と、ポインターの位置（中央が 0、端が ±1）から一枚描きます。 */
-  render: (progress: number, pointerX: number, pointerY: number) => void;
+  /**
+   * 進み具合と、ポインターの位置（中央が 0、端が ±1）から一枚描きます。
+   * 自分で動いている最中（読みこみ直後の回りこみ）は true を返すので、
+   * そのあいだは続けて呼んでください。
+   */
+  render: (progress: number, pointerX: number, pointerY: number, now: number) => boolean;
   dispose: () => void;
 };
+
+const RAD = Math.PI / 180;
 
 /** KEYS の一列を、進み具合に合わせて、なめらかにつないだ値で返します。 */
 function track(column: number, progress: number) {
@@ -227,16 +243,12 @@ export function createRibbon(
   }
 
   const scene = new Scene();
-  const camera = new PerspectiveCamera(FOV, 1, 1, 10);
+  const camera = new PerspectiveCamera(30, 1, 1, 10);
 
   /* すべての写真で共有する値。描く直前に書き換えます。 */
   const shared = {
     uSide: { value: 1 },
-    uFade: { value: 1 },
-    uHeadAngle: { value: 0 },
-    uArc: { value: 1 },
-    uEnter: { value: ENTER },
-    uLeave: { value: LEAVE },
+    uSeam: { value: [SEAM_IN[0], SEAM_IN[1], SEAM_OUT[0], SEAM_OUT[1]] },
   };
 
   const uvs = new Float32Array((SEGMENTS + 1) * 4);
@@ -251,11 +263,15 @@ export function createRibbon(
 
   const frames: Frame[] = Array.from({ length: COUNT }, () => {
     const positions = new Float32Array((SEGMENTS + 1) * 6);
-    const attribute = new BufferAttribute(positions, 3);
-    attribute.setUsage(DynamicDrawUsage);
+    const angles = new Float32Array((SEGMENTS + 1) * 2);
+    const position = new BufferAttribute(positions, 3);
+    const angle = new BufferAttribute(angles, 1);
+    position.setUsage(DynamicDrawUsage);
+    angle.setUsage(DynamicDrawUsage);
 
     const geometry = new BufferGeometry();
-    geometry.setAttribute("position", attribute);
+    geometry.setAttribute("position", position);
+    geometry.setAttribute("angle", angle);
     geometry.setAttribute("uv", new BufferAttribute(uvs, 2));
     geometry.setIndex(indices);
 
@@ -268,8 +284,6 @@ export function createRibbon(
         uCover: { value: new Vector2(1, 1) },
         uTone: { value: new Color(0xe4e4e3) },
         uLoaded: { value: 0 },
-        uLead: { value: 0 },
-        uLength: { value: 1 },
       },
       side: DoubleSide,
       transparent: true,
@@ -280,7 +294,7 @@ export function createRibbon(
     mesh.frustumCulled = false;
     scene.add(mesh);
 
-    return { mesh, positions, attribute };
+    return { mesh, positions, angles, position, angle };
   });
 
   /* 画像は一枚につき一度だけ読みこみ、同じ画像を使う枚すべてに配ります。 */
@@ -317,16 +331,22 @@ export function createRibbon(
 
   let width = 1;
   let height = 1;
+  let unit = 1;
   let distance = 1;
+  /** 読みこみ直後の回りこみを始めた時刻。まだなら -1。 */
+  let introStart = -1;
 
   const resize = (nextWidth: number, nextHeight: number) => {
     width = Math.max(1, nextWidth);
     height = Math.max(1, nextHeight);
-    distance = height / 2 / Math.tan((FOV * Math.PI) / 360);
+    unit = Math.min(height, width * 0.8);
+    distance = unit * DISTANCE;
 
+    /* 奥行き 0 の面が、画面の大きさとぴったり重なる画角にします。 */
+    camera.fov = (2 * Math.atan(height / 2 / distance)) / RAD;
     camera.aspect = width / height;
     camera.near = distance * 0.04;
-    camera.far = distance * 8;
+    camera.far = distance * 6;
     camera.updateProjectionMatrix();
 
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -336,73 +356,77 @@ export function createRibbon(
     }
   };
 
-  const render = (progress: number, pointerX: number, pointerY: number) => {
-    /* 縦長の画面では、筒も帯も小さくして、写真が大きくなりすぎないようにします。 */
-    const unit = height * Math.min(1, Math.max(0.5, width / (height * 1.3)));
+  const render = (progress: number, pointerX: number, pointerY: number, now: number) => {
+    /*
+     * 読みこみ直後は、帯を少し手前から回しこみます。途中までスクロールした
+     * 位置で開いたときは、その分だけ控えめにします。
+     */
+    const ready = textures.length >= Math.min(3, images.length);
+    if (ready && introStart < 0) introStart = now;
+    const elapsed = ready ? Math.min((now - introStart) / INTRO, 1) : 0;
+    const intro = (1 - elapsed) ** 3 * Math.max(0, 1 - progress * 8);
+
+    const head = HEAD_START + TURN * progress - intro * INTRO_TURN;
+    const centerX = track(1, progress) * unit;
+    const centerY = (track(2, progress) - intro * 0.06) * height;
+    const roll = track(3, progress) * RAD;
+    const pitch = track(4, progress) * RAD;
+    const flare = Math.tan(track(5, progress) * RAD);
+
+    const cosR = Math.cos(roll);
+    const sinR = Math.sin(roll);
+    const cosP = Math.cos(pitch);
+    const sinP = Math.sin(pitch);
     const radius = unit * RADIUS;
-    const band = unit * BAND;
-    const rise = unit * RISE;
-    const frameLength = band * FRAME_RATIO;
-    const pitch = frameLength + band * GAP;
-
-    /* 筒の正面を、決めた大きさ・決めた画面位置に置きます。 */
-    const scale = track(3, progress);
-    const frontZ = distance * (1 - 1 / scale);
-    const centerX = (track(1, progress) * (width / 2)) / scale;
-    const centerY = (track(2, progress) * (height / 2)) / scale;
-    const headAngle = track(4, progress);
-
-    /* 筒の向き。画面の中で倒し、さらに上から見こみます。 */
-    const tilt = track(5, progress);
-    const look = track(6, progress);
-    const cosT = Math.cos(tilt);
-    const sinT = Math.sin(tilt);
-    const cosL = Math.cos(look);
-    const sinL = Math.sin(look);
-
-    shared.uFade.value = frameLength * 0.9;
-    shared.uHeadAngle.value = headAngle;
-    shared.uArc.value = radius;
+    const half = (unit * FRAME_HEIGHT) / 2;
 
     frames.forEach((frame, index) => {
-      const lead = index * pitch;
-      const uniforms = frame.mesh.material.uniforms;
-      uniforms.uLead.value = lead;
-      uniforms.uLength.value = frameLength;
+      const lead = head - index * STEP;
+      const trail = lead - FRAME_ANGLE;
 
-      const { positions } = frame;
+      /* 継ぎ目の外にいる写真は、描く手間を省きます。 */
+      frame.mesh.visible = lead > SEAM_IN[0] && trail < SEAM_OUT[1];
+      if (!frame.mesh.visible) return;
+
+      const { positions, angles } = frame;
       for (let i = 0; i <= SEGMENTS; i++) {
         /* i = 0 が後ろの端、i = SEGMENTS が進行方向の端です。 */
-        const angle = headAngle - (lead + frameLength * (1 - i / SEGMENTS)) / radius;
-
-        /* 筒の上の一点（筒の軸が真上を向いているときの座標）。 */
-        const x = radius * Math.sin(angle);
-        const z = radius * Math.cos(angle) - radius;
-        const y = rise * angle;
+        const theta = trail + (FRAME_ANGLE * i) / SEGMENTS;
+        const sin = Math.sin(theta);
+        const cos = Math.cos(theta);
 
         for (let edge = 0; edge < 2; edge++) {
-          const ly = y + (edge === 0 ? band / 2 : -band / 2);
+          const v = edge === 0 ? half : -half;
+          /* 輪の上の一点。輪の軸が真上を向いているときの座標です。 */
+          const r = radius + v * flare;
+          const x = r * sin;
+          const z = r * cos;
 
-          /* 上から見こむ（横軸まわり）→ 画面の中で倒す（奥行きの軸まわり）。 */
-          const ry = ly * cosL - z * sinL;
-          const rz = ly * sinL + z * cosL;
+          /* 奥側を持ち上げる（横軸まわり）→ 画面の中で倒す（奥行きの軸まわり）。 */
+          const y2 = v * cosP - z * sinP;
+          const z2 = v * sinP + z * cosP;
           const offset = i * 6 + edge * 3;
-          positions[offset] = centerX + x * cosT - ry * sinT;
-          positions[offset + 1] = centerY + x * sinT + ry * cosT;
-          positions[offset + 2] = frontZ + rz;
+          positions[offset] = centerX + x * cosR - y2 * sinR;
+          positions[offset + 1] = centerY + x * sinR + y2 * cosR;
+          positions[offset + 2] = z2;
+          angles[i * 2 + edge] = theta;
         }
       }
-      frame.attribute.needsUpdate = true;
+      frame.position.needsUpdate = true;
+      frame.angle.needsUpdate = true;
     });
 
     /* ポインターに合わせて、視点をわずかに振ります。 */
-    camera.position.set(pointerX * width * 0.018, -pointerY * height * 0.018, distance);
+    camera.position.set(pointerX * unit * 0.016, -pointerY * unit * 0.016, distance);
     camera.lookAt(0, 0, 0);
 
     shared.uSide.value = -1;
     renderers[0].render(scene, camera);
     shared.uSide.value = 1;
     renderers[1].render(scene, camera);
+
+    /* 画像を待っているあいだは、読みこみの知らせが次の描画を呼びます。 */
+    return ready && elapsed < 1;
   };
 
   /* 描画の環境が作り直されたら（GPU の切り替えなど）、描き直しを頼みます。 */

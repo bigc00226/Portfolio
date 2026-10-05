@@ -28,8 +28,11 @@ type DesignHeroProps = {
 
 const MOTION_OK = "(prefers-reduced-motion: no-preference)";
 
-/** 舞台を固定しておく長さ（画面の高さの 100 分の 1 が単位）。 */
-const PIN = 260;
+/**
+ * 舞台を固定しておく長さ（画面の高さの 100 分の 1 が単位）。
+ * 大きくするほど、帯がゆっくり回ります。
+ */
+const PIN = 190;
 
 /** スクロールの動きを、絵がこの時間（ミリ秒）で追いかけます。 */
 const FOLLOW = 110;
@@ -41,12 +44,22 @@ const SCRIPT =
 /** 手書きの線のうち、最後まで残しておく部分（「ed」）の始まり。 */
 const SCRIPT_KEEP = 0.53;
 
+/**
+ * 見出しの各行が抜けていく時期。固定が外れる瞬間を 0 として、画面の高さ
+ * ひとつ分のスクロールを 1 と数えます。上の行ほど早く、速く抜けます。
+ */
+const EXITS = [
+  { from: -0.42, span: 0.5 },
+  { from: -0.38, span: 0.57 },
+  { from: -0.34, span: 0.64 },
+];
+
 const clamp01 = (value: number) => (value < 0 ? 0 : value > 1 ? 1 : value);
 const ease = (x: number) => x * x * (3 - 2 * x);
 const range = (from: number, to: number, value: number) => clamp01((value - from) / (to - from));
 
 /**
- * ページの最初の画面。大きな見出しのあいだを、写真の帯がくぐり抜けていきます。
+ * ページの最初の画面。写真の帯が、大きな見出しの前後を、輪を描いて回っていきます。
  *
  * サーバーが返す HTML は、見出しと画像の並びだけの、動かない画面です。
  * JavaScript を無効にしている方と、「視差効果を減らす」設定の方には、
@@ -81,6 +94,7 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
 
     const exits = Array.from(stage.querySelectorAll<HTMLElement>("[data-exit]"));
     const cue = cueRef.current;
+    const root = document.documentElement;
 
     let ribbon: Ribbon | null = null;
     let disposed = false;
@@ -95,6 +109,7 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
     let snap = true;
     let dirty = true;
     let visible = true;
+    let onStage = true;
     let frame = 0;
     let before = 0;
 
@@ -105,43 +120,56 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
       dirty = true;
     };
 
-    /** 固定が外れて舞台が流れていくあいだも、少し先まで数えます。 */
+    /** 舞台が画面の上へ流れきる位置。 */
+    const leaveAt = () => travel + stageHeight - 1;
+
+    /** 固定が外れて舞台が流れていくあいだも、流れきるまで数えます。 */
     const read = () => {
       const rect = hero.getBoundingClientRect();
       visible = rect.bottom > 0 && rect.top < window.innerHeight;
       return Math.min(Math.max(-rect.top, 0), travel + stageHeight);
     };
 
-    const draw = (scrolled: number) => {
+    const draw = (scrolled: number, now: number) => {
       /* 固定しているあいだが 0〜1。固定が外れたあとは 1 を超えていきます。 */
-      const pinned = scrolled / travel;
-      /* 見出しが抜けていく時計。画面の高さひとつ分のスクロールで 1 進みます。 */
-      const leaving = (scrolled - travel) / stageHeight + 0.06;
+      const progress = scrolled / travel;
+      /* 固定が外れる瞬間を 0 とした、画面の高さひとつ分を 1 とする時計。 */
+      const released = (scrolled - travel) / stageHeight;
 
       /* 手書きの線：書いて、しばらく見せて、書き始めのほうから消していきます。 */
-      const written = ease(range(0.16, 0.36, pinned));
-      const erased = SCRIPT_KEEP * ease(range(0.74, 1, pinned));
+      const written = range(0.05, 0.3, progress);
+      const erased = SCRIPT_KEEP * ease(range(0.6, 0.95, progress));
       const length = written - erased;
       script.style.strokeDasharray = `${Math.max(length, 0).toFixed(4)} 1`;
       script.style.strokeDashoffset = (-erased).toFixed(4);
       script.style.opacity = length > 0.002 ? "1" : "0";
 
-      /* 見出しは、固定が外れる少し前から、上の行から順に抜けていきます。 */
+      /* 見出しは、ゆっくり動きだして、上の行から順に抜けていきます。 */
       exits.forEach((line, index) => {
-        const out = ease(range(0, 0.3, leaving - index * 0.045));
+        const { from, span } = EXITS[Math.min(index, EXITS.length - 1)];
+        const out = range(from, from + span, released) ** 1.8;
         line.style.transform = `translate3d(0, ${(-out * 104).toFixed(2)}%, 0)`;
       });
 
-      if (cue) cue.style.opacity = (1 - range(0, 0.06, pinned)).toFixed(3);
+      if (cue) cue.style.opacity = (1 - range(0, 0.05, progress)).toFixed(3);
 
-      /* 帯は、固定が外れたあともしばらく奥へ進みつづけます。 */
-      ribbon?.render(clamp01(scrolled / (travel + stageHeight * 0.85)), lookX, lookY);
+      /* 帯は、固定が外れたあとも、舞台が流れ去るまで回りつづけます。 */
+      return ribbon?.render(progress, lookX, lookY, now) ?? false;
     };
 
     const tick = (now: number) => {
       const elapsed = Math.min(now - before, 250);
       before = now;
       target = read();
+
+      /*
+       * 舞台が画面に残っているあいだは、ページ共通のヘッダーも画面に残して
+       * もらいます（SiteHeader.module.css が、この目印を見ています）。
+       */
+      if (target < leaveAt() !== onStage) {
+        onStage = !onStage;
+        root.setAttribute("data-design-hero", onStage ? "on" : "left");
+      }
 
       const follow = 1 - Math.exp(-elapsed / FOLLOW);
       const gap = target - shown;
@@ -160,11 +188,12 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
       /* 画面の外にあるあいだは描かず、戻ってきたときに描き直します。 */
       if (changed) dirty = true;
       if (dirty && visible) {
-        dirty = false;
-        draw(shown);
+        /* 帯が自分で動いている最中なら、次のコマも描きます。 */
+        dirty = draw(shown, now);
       }
 
-      frame = shown === target && settled ? 0 : requestAnimationFrame(tick);
+      frame =
+        shown === target && settled && !(dirty && visible) ? 0 : requestAnimationFrame(tick);
     };
 
     const request = () => {
@@ -189,7 +218,9 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
     measure();
     target = read();
     shown = target;
-    draw(shown);
+    onStage = target < leaveAt();
+    root.setAttribute("data-design-hero", onStage ? "on" : "left");
+    draw(shown, performance.now());
     dirty = false;
 
     window.addEventListener("scroll", request, { passive: true });
@@ -238,6 +269,7 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
       ribbon?.dispose();
 
       hero.removeAttribute("data-ribbon");
+      root.removeAttribute("data-design-hero");
       script.style.strokeDasharray = "";
       script.style.strokeDashoffset = "";
       script.style.opacity = "";

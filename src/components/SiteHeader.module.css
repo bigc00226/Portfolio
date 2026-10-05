@@ -4,6 +4,28 @@
   top: 0;
   z-index: 6;
   padding-block: clamp(16px, 2.4vw, 26px);
+  transition:
+    opacity 0.3s var(--ease-soft),
+    transform 0.45s var(--ease),
+    visibility 0s;
+}
+
+/*
+ * /design では、最初の画面（舞台）が見えているあいだ、ヘッダーも画面に残します。
+ * 舞台が流れきったら、上へ引っこめます。切り替えているのは DesignHero.tsx です。
+ */
+:global(html[data-design-hero]) .header {
+  position: fixed;
+}
+
+:global(html[data-design-hero="left"]) .header {
+  opacity: 0;
+  visibility: hidden;
+  transform: translate3d(0, -100%, 0);
+  transition:
+    opacity 0.3s var(--ease-soft),
+    transform 0.45s var(--ease),
+    visibility 0s linear 0.45s;
 }
 
 .inner {
@@ -46,11 +68,17 @@
   transform: translateY(-1px);
 }
 
+/* ロゴの文字。見出しと同じ欧文書体で組みます。 */
 .wordmark {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--text);
+  font-family:
+    var(--font-display), var(--font-jp), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.125rem;
+  font-weight: 800;
+  font-variation-settings: "wdth" 112;
+  letter-spacing: 0.005em;
+  line-height: 1;
+  color: var(--ink);
+  white-space: nowrap;
 }
 
 .meta {
@@ -68,8 +96,12 @@
 }
 
 @media (max-width: 720px) {
+  .mark {
+    gap: 11px;
+  }
+
   .wordmark {
-    display: none;
+    font-size: 1rem;
   }
 
   .logo {
@@ -81,5 +113,12 @@
   .meta {
     font-size: 0.625rem;
     gap: 9px;
+  }
+}
+
+/* 狭い画面では、ロゴの文字を残し、右側は件数だけにします。 */
+@media (max-width: 389px) {
+  .meta > :not(:first-child) {
+    display: none;
   }
 }

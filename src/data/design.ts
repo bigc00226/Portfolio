@@ -14,7 +14,8 @@ import frame08 from "@/images/design/08.jpg";
  *
  * 帯に並ぶ画像は、本番の写真が用意できるまでの仮のものです。
  * src/images/design/ の 01.jpg〜08.jpg を同じ名前で上書きすれば、
- * そのまま差し替わります。横長（3:2 前後）の写真がよく合います。
+ * そのまま差し替わります。帯の枠は 16:9 です。比率の違う写真は、
+ * ゆがめずに、枠いっぱいになるよう切り抜いて表示します。
  */
 
 export type DesignFrame = {
@@ -25,7 +26,7 @@ export type DesignFrame = {
 
 export const design = {
   /** ブラウザのタブと、検索結果・SNS のリンクに出る文言。 */
-  title: "BE LOVED ENGINEER｜システム＆AIエンジニア",
+  title: "BE LOVED ENGINEER｜Love Apple",
   description:
     "システムと AI の開発、そして Web 制作。愛されるエンジニアであるために大切にしていることを、スクロールで動く写真の帯とともにご紹介します。",
 
@@ -45,7 +46,7 @@ export const design = {
     reading: "システム＆AI開発。愛されるエンジニア。",
     /** 画面の左右の端に、縦に置く小さな文字。 */
     sideLeft: "SYSTEM & AI DEVELOPMENT",
-    sideRight: "BY BELOVED ENGINEER",
+    sideRight: "BY LOVE APPLE",
     scrollLabel: "スクロール",
   },
 

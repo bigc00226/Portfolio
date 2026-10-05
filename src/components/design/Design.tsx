@@ -18,7 +18,7 @@ function textureUrl(src: string, width: number) {
     src,
     alt: "",
     width,
-    height: Math.round(width / 1.5),
+    height: Math.round((width * 9) / 16),
   });
   /* srcSet の先頭（1x）が、指定した幅に合わせた画像です。 */
   return props.srcSet?.split(", ")[0]?.split(" ")[0] ?? props.src;
