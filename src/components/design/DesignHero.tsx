@@ -139,6 +139,9 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
     const inkTotal = inks.reduce((sum, length) => sum + length, 0);
     const firstInk = inks[0] ?? 0;
     const lastInk = inks[inks.length - 1] ?? 0;
+    /* 線ごとの、いま見せている範囲。変わった線にだけ書きこみます。 */
+    const marks = pens.map(() => "");
+    const tints = fills.map(() => "");
 
     let ribbon: Ribbon | null = null;
     let disposed = false;
@@ -183,19 +186,27 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
       /* 手書きの線：書いて、しばらく見せて、書き始めのほうから消していきます。 */
       const drawn = range(WRITE[0], WRITE[1], progress) * inkTotal;
       const wiped = ease(range(WIPE[0], WIPE[1], progress)) * (inkTotal - lastInk);
-      let start = 0;
+      let end = 0;
       pens.forEach((pen, index) => {
+        /* この線の持ち場は、インクの通し番号で begin〜end。そのうち from〜to を見せます。 */
         const length = inks[index];
-        const from = Math.max(wiped, start);
-        const to = Math.min(drawn, start + length);
-        if (to - from < 0.05) {
-          pen.style.opacity = "0";
-        } else {
-          pen.style.opacity = "1";
-          pen.style.strokeDasharray = `${((to - from) / length).toFixed(4)} 1`;
-          pen.style.strokeDashoffset = (-(from - start) / length).toFixed(4);
+        const begin = end;
+        end += length;
+        const from = Math.max(wiped, begin);
+        const to = Math.min(drawn, end);
+
+        const shown = to - from >= 0.05;
+        const dash = shown ? ((to - from) / length).toFixed(4) : "";
+        const offset = shown ? ((begin - from) / length).toFixed(4) : "";
+        const mark = `${dash} ${offset}`;
+        if (mark === marks[index]) return;
+        marks[index] = mark;
+
+        pen.style.opacity = shown ? "1" : "0";
+        if (shown) {
+          pen.style.strokeDasharray = `${dash} 1`;
+          pen.style.strokeDashoffset = offset;
         }
-        start += length;
       });
 
       /* ハートは、線がひとまわりしたところで塗られます。左は、線と一緒に消えます。 */
@@ -204,7 +215,10 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
         range(inkTotal - lastInk * 0.14, inkTotal, drawn),
       ];
       fills.forEach((fill, index) => {
-        fill.style.opacity = (filled[index] ?? 0).toFixed(3);
+        const tint = (filled[index] ?? 0).toFixed(3);
+        if (tint === tints[index]) return;
+        tints[index] = tint;
+        fill.style.opacity = tint;
       });
 
       /* 見出しは、ゆっくり動きだして、上の行から順に抜けていきます。 */
