@@ -4,12 +4,12 @@
    ========================================================================= */
 
 .page {
-  /* 手書きの文字の色。このページでだけ使う、差し色です。 */
-  --accent: #f26a1b;
-  /* 見出しのうち、薄く置く字の色。 */
-  --ghost: #e7e7e6;
+  /* ハートと手書きの線の色。このページでだけ使う、差し色です。 */
+  --accent: #e8384f;
+  /* 線でなぞられる前の、淡いハートの色。 */
+  --ghost: #f6d9da;
   /* 見出しの字の大きさ。幅と高さの、どちらにも収まるようにします。 */
-  --size: min(11.2vw, 21.5svh);
+  --size: min(10.4vw, 15.5svh);
 
   position: relative;
   background: var(--raise-1);
@@ -47,12 +47,20 @@
   font-size: var(--size);
   font-weight: 900;
   font-variation-settings: "wdth" 125;
+  /* 全角の字を一文字ぶんの幅のまま並べます。ハートの位置が、この幅を頼りにしています。 */
   font-feature-settings: normal;
-  letter-spacing: -0.03em;
-  line-height: 0.8;
+  letter-spacing: 0;
+  line-height: 1.1;
   color: var(--ink);
   text-align: center;
   white-space: nowrap;
+}
+
+/* 欧文は、和文より背が低く見えるので、ひと回り大きく組みます。行の高さは変えません。 */
+.latin {
+  font-size: 1.2em;
+  line-height: 0;
+  letter-spacing: -0.02em;
 }
 
 .line {
@@ -74,32 +82,44 @@
 }
 
 .rise {
+  position: relative;
   animation: rise 1.05s var(--ease) both;
   animation-delay: calc(var(--i) * 110ms + 160ms);
 }
 
-.ghost {
-  color: var(--ghost);
+/* 二行目の両側に空けておく、ハートの置き場所。幅は hearts.ts の SLOT と合わせます。 */
+.heartSlot {
+  display: inline-block;
+  width: 0.9em;
 }
 
 /*
- * 手書きの文字。二行目の、薄い字の上に重ねます。
- * 位置と大きさは、行の幅に対する割合で決めています。
+ * ハートを描く枠。二行目の行ぜんたいに、中央をそろえて重ねます。
+ * 淡いハート（.ghost）と、手書きの線（.script）とで、同じ枠を使います。
  */
-.script {
+.overlay {
   position: absolute;
-  left: 24.5%;
-  bottom: -0.2em;
-  width: 80%;
+  top: 50%;
+  left: 0;
+  width: 100%;
   height: auto;
   overflow: visible;
   pointer-events: none;
+  transform: translateY(-50%);
 }
 
-.script path {
+.ghost path {
+  fill: var(--ghost);
+}
+
+.fill {
+  fill: var(--accent);
+}
+
+.pen {
   fill: none;
   stroke: var(--accent);
-  stroke-width: 31;
+  stroke-width: 9;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-dasharray: 1 1;
@@ -211,7 +231,7 @@
 /*
  * スクロールで動かす状態へ切り替わる環境では、切り替わる前から、それに合わせて
  * おきます。高さを先に取っておくのは、再読み込みのあとに元のスクロール位置へ
- * 戻れるようにするため。手書きの文字と画像の並びを隠しておくのは、切り替わった
+ * 戻れるようにするため。手書きの線と画像の並びを隠しておくのは、切り替わった
  * 瞬間に消えて、ちらついて見えるのを避けるためです。
  */
 @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
@@ -219,7 +239,7 @@
     min-height: calc(100svh + var(--pin) * 1svh);
   }
 
-  .hero:not(.cinema) .script path {
+  .hero:not(.cinema) .script {
     opacity: 0;
   }
 
@@ -412,7 +432,7 @@
 
 @media (max-width: 760px) {
   .page {
-    --size: min(12.2vw, 21svh);
+    --size: min(13.4vw, 15.5svh);
   }
 
   /* 縦長の画面でも、帯が見出しの上を通るよう、見出しを中ほどに下げます。 */

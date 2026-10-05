@@ -26,24 +26,20 @@ export type DesignFrame = {
 
 export const design = {
   /** ブラウザのタブと、検索結果・SNS のリンクに出る文言。 */
-  title: "BE LOVED ENGINEER｜Love Apple",
+  title: "システム＆AI ❤️愛される❤️ エンジニア｜Love Apple",
   description:
     "システムと AI の開発、そして Web 制作。愛されるエンジニアであるために大切にしていることを、スクロールで動く写真の帯とともにご紹介します。",
 
   hero: {
     /**
-     * 見出しは三行です。二行目は、黒い字（solid）と薄い字（ghost）に分かれ、
-     * 薄い字の上に、手書きの文字が描かれます。
-     *
-     * 手書きの文字は「Loved」と書いた線の絵（DesignHero.tsx の SCRIPT）です。
-     * ghost の語を変える場合は、その線も描き直す必要があります。
+     * 見出しは三行です。二行目（middle）の両側には、ハートが付きます。
+     * ハートは、はじめは淡い色で置かれていて、スクロールすると赤い手書きの線で
+     * なぞられ、塗られます。二行目は、全角の文字で書いてください。ハートの位置を、
+     * 文字数から決めています。
      */
-    first: "SYSTEM&AI",
-    solid: "BE",
-    ghost: "LOVED",
-    last: "ENGINEER",
-    /** 英字の見出しを日本語で補う文。画面には出ず、読み上げと検索に使われます。 */
-    reading: "システム＆AI開発。愛されるエンジニア。",
+    first: "システム＆AI",
+    middle: "愛される",
+    last: "エンジニア",
     /** 画面の左右の端に、縦に置く小さな文字。 */
     sideLeft: "SYSTEM & AI DEVELOPMENT",
     sideRight: "BY LOVE APPLE",

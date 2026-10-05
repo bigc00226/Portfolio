@@ -1,18 +1,17 @@
 "use client";
 
-import { useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import { useIsomorphicLayoutEffect } from "@/components/useInView";
 
 import styles from "./Design.module.css";
+import { buildHearts } from "./hearts";
 import type { Ribbon } from "./ribbon";
 
 export type HeroCopy = {
   first: string;
-  solid: string;
-  ghost: string;
+  middle: string;
   last: string;
-  reading: string;
   sideLeft: string;
   sideRight: string;
   scrollLabel: string;
@@ -37,12 +36,12 @@ const PIN = 190;
 /** スクロールの動きを、絵がこの時間（ミリ秒）で追いかけます。 */
 const FOLLOW = 110;
 
-/** 手書きの「Loved」。一本の線で、左から右へ書き順どおりに並んでいます。 */
-const SCRIPT =
-  "M 96 262 C 150 214 232 96 212 56 C 198 28 152 50 152 112 C 152 214 166 312 122 380 C 96 420 44 396 70 360 C 96 326 170 404 252 392 C 300 384 350 320 365 276 C 372 250 330 246 305 280 C 280 316 282 380 322 392 C 360 402 386 330 366 276 C 380 300 410 300 430 268 C 446 300 456 392 478 392 C 506 392 526 310 536 262 C 540 290 558 322 586 338 C 640 334 666 270 626 258 C 586 248 570 330 586 366 C 602 400 660 400 700 350 C 740 320 790 290 816 270 C 800 248 740 250 722 320 C 706 386 776 410 812 340 C 840 286 880 150 872 70 C 866 30 822 60 826 150 C 830 260 822 360 858 390 C 890 412 940 380 970 330";
-
-/** 手書きの線のうち、最後まで残しておく部分（「ed」）の始まり。 */
-const SCRIPT_KEEP = 0.53;
+/**
+ * 手書きの線を書く区間と、消していく区間（固定しているあいだの進み具合）。
+ * 消すのは左のハートと下線だけで、右のハートは最後まで残します。
+ */
+const WRITE = [0.05, 0.3] as const;
+const WIPE = [0.6, 0.95] as const;
 
 /**
  * 見出しの各行が抜けていく時期。固定が外れる瞬間を 0 として、画面の高さ
@@ -58,22 +57,37 @@ const clamp01 = (value: number) => (value < 0 ? 0 : value > 1 ? 1 : value);
 const ease = (x: number) => x * x * (3 - 2 * x);
 const range = (from: number, to: number, value: number) => clamp01((value - from) / (to - from));
 
+/** 欧文のまとまりを包みます。和文と高さがそろうよう、CSS で少し大きく組みます。 */
+function mixed(text: string) {
+  return text.split(/([A-Za-z0-9]+)/).map((run, index) =>
+    index % 2 === 1 ? (
+      <span key={index} className={styles.latin}>
+        {run}
+      </span>
+    ) : (
+      run
+    ),
+  );
+}
+
 /**
  * ページの最初の画面。写真の帯が、大きな見出しの前後を、輪を描いて回っていきます。
  *
  * サーバーが返す HTML は、見出しと画像の並びだけの、動かない画面です。
  * JavaScript を無効にしている方と、「視差効果を減らす」設定の方には、
  * そのままお見せします。動かせる環境では舞台を画面に固定し、スクロール量を
- * 帯の進み具合・手書きの線の長さ・見出しの退場に置き換えます。
+ * 帯の進み具合・ハートを書く手書きの線・見出しの退場に置き換えます。
  */
 export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
   const heroRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const backRef = useRef<HTMLDivElement>(null);
   const frontRef = useRef<HTMLDivElement>(null);
-  const scriptRef = useRef<SVGPathElement>(null);
   const cueRef = useRef<HTMLParagraphElement>(null);
   const [cinema, setCinema] = useState(false);
+
+  /* 二行目は全角の文字で書く前提で、文字数からハートの位置を決めます。 */
+  const hearts = useMemo(() => buildHearts(Array.from(copy.middle).length), [copy.middle]);
 
   useIsomorphicLayoutEffect(() => {
     const query = window.matchMedia(MOTION_OK);
@@ -89,12 +103,19 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
     const stage = stageRef.current;
     const back = backRef.current;
     const front = frontRef.current;
-    const script = scriptRef.current;
-    if (!cinema || !hero || !stage || !back || !front || !script) return;
+    if (!cinema || !hero || !stage || !back || !front) return;
 
     const exits = Array.from(stage.querySelectorAll<HTMLElement>("[data-exit]"));
     const cue = cueRef.current;
     const root = document.documentElement;
+
+    /* 手書きの線（左のハート、下線、右のハート）と、ハートの塗り（左、右）。 */
+    const pens = Array.from(stage.querySelectorAll<SVGPathElement>("[data-pen]"));
+    const fills = Array.from(stage.querySelectorAll<SVGPathElement>("[data-heart]"));
+    const inks = pens.map((pen) => pen.getTotalLength());
+    const inkTotal = inks.reduce((sum, length) => sum + length, 0);
+    const firstInk = inks[0] ?? 0;
+    const lastInk = inks[inks.length - 1] ?? 0;
 
     let ribbon: Ribbon | null = null;
     let disposed = false;
@@ -137,12 +158,31 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
       const released = (scrolled - travel) / stageHeight;
 
       /* 手書きの線：書いて、しばらく見せて、書き始めのほうから消していきます。 */
-      const written = range(0.05, 0.3, progress);
-      const erased = SCRIPT_KEEP * ease(range(0.6, 0.95, progress));
-      const length = written - erased;
-      script.style.strokeDasharray = `${Math.max(length, 0).toFixed(4)} 1`;
-      script.style.strokeDashoffset = (-erased).toFixed(4);
-      script.style.opacity = length > 0.002 ? "1" : "0";
+      const drawn = range(WRITE[0], WRITE[1], progress) * inkTotal;
+      const wiped = ease(range(WIPE[0], WIPE[1], progress)) * (inkTotal - lastInk);
+      let start = 0;
+      pens.forEach((pen, index) => {
+        const length = inks[index];
+        const from = Math.max(wiped, start);
+        const to = Math.min(drawn, start + length);
+        if (to - from < 0.05) {
+          pen.style.opacity = "0";
+        } else {
+          pen.style.opacity = "1";
+          pen.style.strokeDasharray = `${((to - from) / length).toFixed(4)} 1`;
+          pen.style.strokeDashoffset = (-(from - start) / length).toFixed(4);
+        }
+        start += length;
+      });
+
+      /* ハートは、線がひとまわりしたところで塗られます。左は、線と一緒に消えます。 */
+      const filled = [
+        range(firstInk * 0.86, firstInk * 1.1, drawn) * (1 - range(0, firstInk * 0.7, wiped)),
+        range(inkTotal - lastInk * 0.14, inkTotal, drawn),
+      ];
+      fills.forEach((fill, index) => {
+        fill.style.opacity = (filled[index] ?? 0).toFixed(3);
+      });
 
       /* 見出しは、ゆっくり動きだして、上の行から順に抜けていきます。 */
       exits.forEach((line, index) => {
@@ -270,13 +310,16 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
 
       hero.removeAttribute("data-ribbon");
       root.removeAttribute("data-design-hero");
-      script.style.strokeDasharray = "";
-      script.style.strokeDashoffset = "";
-      script.style.opacity = "";
+      for (const pen of pens) {
+        pen.style.strokeDasharray = "";
+        pen.style.strokeDashoffset = "";
+        pen.style.opacity = "";
+      }
+      for (const fill of fills) fill.style.opacity = "";
       for (const line of exits) line.style.transform = "";
       if (cue) cue.style.opacity = "";
     };
-  }, [cinema, frames]);
+  }, [cinema, frames, hearts]);
 
   const line = (children: ReactNode, index: number) => (
     <span className={styles.mask}>
@@ -302,29 +345,42 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
         <div className={styles.type}>
           <h1 id="design-headline" className={styles.headline}>
             {/* 行のあいだの空白は、読み上げや検索で語がつながらないようにするためのものです。 */}
-            <span lang="en">
-              <span className={styles.line}>{line(copy.first, 0)}</span>{" "}
-              <span className={styles.line}>
-                {line(
-                  <>
-                    {copy.solid}
-                    <span className={styles.ghost}>{copy.ghost}</span>
-                  </>,
-                  1,
-                )}
-                <svg
-                  className={styles.script}
-                  viewBox="0 0 1040 470"
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path ref={scriptRef} d={SCRIPT} pathLength={1} />
-                </svg>
-              </span>{" "}
-              <span className={styles.line}>{line(copy.last, 2)}</span>
+            <span className={styles.line}>{line(mixed(copy.first), 0)}</span>{" "}
+            <span className={styles.line}>
+              {line(
+                <>
+                  <span className={styles.heartSlot} aria-hidden="true" />
+                  {mixed(copy.middle)}
+                  <span className={styles.heartSlot} aria-hidden="true" />
+                  {/* 淡い色のハート。行と一緒に動き、上から赤い線でなぞられます。 */}
+                  <svg
+                    className={`${styles.overlay} ${styles.ghost}`}
+                    viewBox={hearts.viewBox}
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d={hearts.fills[0]} />
+                    <path d={hearts.fills[1]} />
+                  </svg>
+                </>,
+                1,
+              )}
+              {/* 手書きの線と、塗られたハート。見出しが抜けたあとも、その場に残ります。 */}
+              <svg
+                className={`${styles.overlay} ${styles.script}`}
+                viewBox={hearts.viewBox}
+                aria-hidden="true"
+                focusable="false"
+              >
+                {hearts.fills.map((d) => (
+                  <path key={d} className={styles.fill} d={d} data-heart="" />
+                ))}
+                {hearts.pens.map((d) => (
+                  <path key={d} className={styles.pen} d={d} pathLength={1} data-pen="" />
+                ))}
+              </svg>
             </span>{" "}
-            {/* 英字の見出しを、日本語で補います。 */}
-            <span className="u-sr-only">{copy.reading}</span>
+            <span className={styles.line}>{line(mixed(copy.last), 2)}</span>
           </h1>
         </div>
 
