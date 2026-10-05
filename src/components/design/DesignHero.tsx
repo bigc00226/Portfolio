@@ -1,11 +1,18 @@
 "use client";
 
-import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  Fragment,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 
 import { useIsomorphicLayoutEffect } from "@/components/useInView";
 
 import styles from "./Design.module.css";
-import { buildHearts } from "./hearts";
+import { buildHandwriting, canWrite } from "./handwriting";
 import type { Ribbon } from "./ribbon";
 
 export type HeroCopy = {
@@ -38,9 +45,9 @@ const FOLLOW = 110;
 
 /**
  * 手書きの線を書く区間と、消していく区間（固定しているあいだの進み具合）。
- * 消すのは左のハートと下線だけで、右のハートは最後まで残します。
+ * 消すのは左のハートと字だけで、右のハートは最後まで残します。
  */
-const WRITE = [0.05, 0.3] as const;
+const WRITE = [0.02, 0.26] as const;
 const WIPE = [0.6, 0.95] as const;
 
 /**
@@ -56,6 +63,22 @@ const EXITS = [
 const clamp01 = (value: number) => (value < 0 ? 0 : value > 1 ? 1 : value);
 const ease = (x: number) => x * x * (3 - 2 * x);
 const range = (from: number, to: number, value: number) => clamp01((value - from) / (to - from));
+
+/**
+ * 二行目の字。手書きで書ける字は淡い色で置いておき、上から線でなぞります。
+ * 書けない字は、ほかの行と同じ黒い字のままにします。
+ */
+function traced(text: string) {
+  return Array.from(text).map((char, index) =>
+    canWrite(char) ? (
+      <span key={index} className={styles.ghostText}>
+        {char}
+      </span>
+    ) : (
+      <Fragment key={index}>{mixed(char)}</Fragment>
+    ),
+  );
+}
 
 /** 欧文のまとまりを包みます。和文と高さがそろうよう、CSS で少し大きく組みます。 */
 function mixed(text: string) {
@@ -86,8 +109,8 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
   const cueRef = useRef<HTMLParagraphElement>(null);
   const [cinema, setCinema] = useState(false);
 
-  /* 二行目は全角の文字で書く前提で、文字数からハートの位置を決めます。 */
-  const hearts = useMemo(() => buildHearts(Array.from(copy.middle).length), [copy.middle]);
+  /* 二行目に重ねる手書き。全角の文字で書かれている前提で、位置を決めます。 */
+  const hand = useMemo(() => buildHandwriting(copy.middle), [copy.middle]);
 
   useIsomorphicLayoutEffect(() => {
     const query = window.matchMedia(MOTION_OK);
@@ -109,7 +132,7 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
     const cue = cueRef.current;
     const root = document.documentElement;
 
-    /* 手書きの線（左のハート、下線、右のハート）と、ハートの塗り（左、右）。 */
+    /* 手書きの線（左のハート、字の一画ずつ、右のハート）と、ハートの塗り（左、右）。 */
     const pens = Array.from(stage.querySelectorAll<SVGPathElement>("[data-pen]"));
     const fills = Array.from(stage.querySelectorAll<SVGPathElement>("[data-heart]"));
     const inks = pens.map((pen) => pen.getTotalLength());
@@ -319,7 +342,7 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
       for (const line of exits) line.style.transform = "";
       if (cue) cue.style.opacity = "";
     };
-  }, [cinema, frames, hearts]);
+  }, [cinema, frames, hand]);
 
   const line = (children: ReactNode, index: number) => (
     <span className={styles.mask}>
@@ -350,34 +373,49 @@ export function DesignHero({ copy, frames, fallback }: DesignHeroProps) {
               {line(
                 <>
                   <span className={styles.heartSlot} aria-hidden="true" />
-                  {mixed(copy.middle)}
+                  {traced(copy.middle)}
                   <span className={styles.heartSlot} aria-hidden="true" />
                   {/* 淡い色のハート。行と一緒に動き、上から赤い線でなぞられます。 */}
                   <svg
-                    className={`${styles.overlay} ${styles.ghost}`}
-                    viewBox={hearts.viewBox}
+                    className={`${styles.overlay} ${styles.ghostHearts}`}
+                    viewBox={hand.viewBox}
                     aria-hidden="true"
                     focusable="false"
                   >
-                    <path d={hearts.fills[0]} />
-                    <path d={hearts.fills[1]} />
+                    <path d={hand.hearts[0]} />
+                    <path d={hand.hearts[1]} />
                   </svg>
                 </>,
                 1,
               )}
-              {/* 手書きの線と、塗られたハート。見出しが抜けたあとも、その場に残ります。 */}
+              {/*
+               * 手書きの線と、塗られたハート。見出しが抜けたあとも、その場に残ります。
+               * 線は、書く順（左のハート、字、右のハート）に並べています。
+               */}
               <svg
                 className={`${styles.overlay} ${styles.script}`}
-                viewBox={hearts.viewBox}
+                viewBox={hand.viewBox}
                 aria-hidden="true"
                 focusable="false"
               >
-                {hearts.fills.map((d) => (
+                {hand.hearts.map((d) => (
                   <path key={d} className={styles.fill} d={d} data-heart="" />
                 ))}
-                {hearts.pens.map((d) => (
-                  <path key={d} className={styles.pen} d={d} pathLength={1} data-pen="" />
+                <path className={styles.pen} d={hand.hearts[0]} pathLength={1} data-pen="" />
+                {hand.glyphs.map((glyph) => (
+                  <g key={glyph.x} transform={`translate(${glyph.x} ${glyph.y})`}>
+                    {glyph.strokes.map((d) => (
+                      <path
+                        key={d}
+                        className={`${styles.pen} ${styles.penText}`}
+                        d={d}
+                        pathLength={1}
+                        data-pen=""
+                      />
+                    ))}
+                  </g>
                 ))}
+                <path className={styles.pen} d={hand.hearts[1]} pathLength={1} data-pen="" />
               </svg>
             </span>{" "}
             <span className={styles.line}>{line(mixed(copy.last), 2)}</span>

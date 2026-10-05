@@ -6,8 +6,9 @@
 .page {
   /* ハートと手書きの線の色。このページでだけ使う、差し色です。 */
   --accent: #e8384f;
-  /* 線でなぞられる前の、淡いハートの色。 */
-  --ghost: #f6d9da;
+  /* 線でなぞられる前の、淡い字と、淡いハートの色。 */
+  --ghost: #e7e7e6;
+  --ghost-heart: #f6d9da;
   /* 見出しの字の大きさ。幅と高さの、どちらにも収まるようにします。 */
   --size: min(10.4vw, 15.5svh);
 
@@ -87,15 +88,20 @@
   animation-delay: calc(var(--i) * 110ms + 160ms);
 }
 
-/* 二行目の両側に空けておく、ハートの置き場所。幅は hearts.ts の SLOT と合わせます。 */
+/* 二行目の両側に空けておく、ハートの置き場所。幅は handwriting.ts の SLOT と合わせます。 */
 .heartSlot {
   display: inline-block;
   width: 0.9em;
 }
 
+/* 手書きでなぞられる字。はじめは淡い色で置いておきます。 */
+.ghostText {
+  color: var(--ghost);
+}
+
 /*
- * ハートを描く枠。二行目の行ぜんたいに、中央をそろえて重ねます。
- * 淡いハート（.ghost）と、手書きの線（.script）とで、同じ枠を使います。
+ * 手書きを描く枠。二行目の行ぜんたいに、中央をそろえて重ねます。
+ * 淡いハート（.ghostHearts）と、手書きの線（.script）とで、同じ枠を使います。
  */
 .overlay {
   position: absolute;
@@ -108,8 +114,8 @@
   transform: translateY(-50%);
 }
 
-.ghost path {
-  fill: var(--ghost);
+.ghostHearts path {
+  fill: var(--ghost-heart);
 }
 
 .fill {
@@ -119,11 +125,16 @@
 .pen {
   fill: none;
   stroke: var(--accent);
-  stroke-width: 9;
+  stroke-width: 8;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-dasharray: 1 1;
   stroke-dashoffset: 0;
+}
+
+/* 字の線は、画が込み合うので、ハートより少し細くします。 */
+.penText {
+  stroke-width: 8;
 }
 
 /*
