@@ -1,0 +1,209 @@
+/* =========================================================================
+   書かれていく文章（/design の「愛されるエンジニア」）
+   小さな字は淡い色から黒へ変わり、大きな字は、ペンを持った手が書いていきます。
+   ========================================================================= */
+
+.writing {
+  /* 小さな字と、大きな字の大きさ。 */
+  --small: clamp(1rem, 0.6rem + 1.1vw, 1.875rem);
+  --big: clamp(1.5rem, 0.7rem + 2vw, 3rem);
+  /* 書かれる前の、淡い字の色。 */
+  --faint: rgba(11, 11, 11, 0.28);
+  /* 大きな字の色と、マーカーの色。 */
+  --blue: #0d5fa6;
+  --orange: #e8591a;
+  --green: #12a32d;
+  --red: var(--accent);
+  --marker: #f4d130;
+
+  display: grid;
+  /* かたまりのあいだは、小さな字の一行ぶん空けます。 */
+  gap: calc(var(--small) * 2.1);
+  font-size: var(--small);
+  font-weight: 700;
+  /*
+   * 原稿用紙に書くように、かなも句読点も、全角の幅のまま並べます
+   * （サイト全体では、かなを詰めて組んでいます）。
+   */
+  font-feature-settings: normal;
+  letter-spacing: 0.05em;
+  line-height: 2.1;
+  /*
+   * 折り返した先の行の頭に来た括弧は、左の空きを詰めます（対応している環境のみ）。
+   * 最初の行の頭は、下の .hang で、どの環境でもそろえています。
+   */
+  text-spacing-trim: space-first;
+  color: var(--ink);
+}
+
+/*
+ * 一行。ペンを持った手は、この枠を基準に置きます。
+ * 画面が狭くて折り返すときは、行の長さをそろえて、最後に一文字だけ残るのを避けます。
+ */
+.row {
+  position: relative;
+  display: block;
+  text-wrap: balance;
+}
+
+/* かぎ括弧で始まる行は、括弧の左の空き（半文字ぶん）だけ、左へ寄せます。 */
+.hang {
+  text-indent: -0.5em;
+}
+
+.hangBig {
+  text-indent: calc(var(--big) * -0.5);
+}
+
+/* 手で書かれる、大きな字 ---------------------------------------------------- */
+
+.pen {
+  font-size: var(--big);
+  letter-spacing: 0.03em;
+  line-height: 1.72;
+  color: var(--tone);
+}
+
+.toneBlue {
+  --tone: var(--blue);
+}
+
+.toneOrange {
+  --tone: var(--orange);
+}
+
+.toneGreen {
+  --tone: var(--green);
+}
+
+.toneRed {
+  --tone: var(--red);
+}
+
+.toneInk {
+  --tone: var(--ink);
+}
+
+/* 最後の一文字と終わりの絵は、行をまたいで離れないようにします。 */
+.keep {
+  white-space: nowrap;
+}
+
+.icon {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  margin-left: 0.14em;
+  vertical-align: -0.26em;
+}
+
+.icon svg,
+.hand svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/*
+ * マーカーの下線。折り返した行でも、書いている端まで、ひと続きに引かれます。
+ * --p は書かれた割合で、Writing.tsx が書き込みます。ないときは、引き終えた姿です。
+ */
+.marker {
+  padding-bottom: 0.08em;
+  background-image: linear-gradient(
+    90deg,
+    var(--marker) calc(var(--p, 1) * 100%),
+    transparent calc(var(--p, 1) * 100%)
+  );
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 0.34em;
+}
+
+.hand {
+  display: none;
+}
+
+/* スクロールで書いていく状態 -------------------------------------------------
+   Writing.tsx が data-live を付けると、字を、字の形で切り抜いた塗りで描きます。
+   塗りの境目（--p）を動かすことで、左から書かれていくように見せています。
+   折り返した行では、塗りが行をまたいでつながるので、読む順に進みます。 */
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .writing[data-live] .plain,
+  .writing[data-live] .written {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* 小さな字：淡い色から黒へ。境目は、少しぼかします。 */
+  .writing[data-live] .plain {
+    --soft: 0.6em;
+
+    background-image: linear-gradient(
+      90deg,
+      var(--ink) calc(var(--p, 1) * (100% + var(--soft)) - var(--soft)),
+      var(--faint) calc(var(--p, 1) * (100% + var(--soft)))
+    );
+  }
+
+  /* 大きな字：書かれるまでは見えません。 */
+  .writing[data-live] .written {
+    background-image: linear-gradient(
+      90deg,
+      var(--tone) calc(var(--p, 1) * 100%),
+      transparent calc(var(--p, 1) * 100% + 1px)
+    );
+  }
+
+  /* 終わりの絵も、字に続けて左から現れます（--q が現れた割合）。 */
+  .writing[data-live] .icon {
+    clip-path: inset(-12% calc((1 - var(--q, 1)) * 100%) -12% -12%);
+  }
+
+  /*
+   * ペンを持った手。左上を行の左上に重ねたうえで、ペン先の先端が原点に来るように
+   * ずらしてあります（数字は writingArt.tsx の HAND_TIP から）。Writing.tsx が
+   * transform で、書いている端へ運びます。
+   */
+  .writing[data-live] .hand {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    display: block;
+    width: calc(var(--big) * 1.84);
+    height: calc(var(--big) * 2.32);
+    margin: calc(var(--big) * -2.124) 0 0 calc(var(--big) * -0.198);
+    transform-origin: 10.76% 91.55%;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.3s var(--ease-soft),
+      visibility 0s linear 0.3s;
+    will-change: transform;
+  }
+
+  /* 書いているあいだ（Writing.tsx が data-writing を付けているあいだ）だけ、手を見せます。 */
+  .writing[data-live] .row[data-writing] > .hand {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+}
+
+/* 画面幅への対応 --------------------------------------------------------- */
+
+@media (max-width: 760px) {
+  .writing {
+    letter-spacing: 0.02em;
+    line-height: 1.95;
+  }
+
+  .pen {
+    letter-spacing: 0;
+    line-height: 1.62;
+  }
+}

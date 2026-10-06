@@ -6,8 +6,10 @@ import { design } from "@/data/design";
 import { ConceptTitle } from "./ConceptTitle";
 import styles from "./Design.module.css";
 import { DesignHero } from "./DesignHero";
+import { LoveFlow } from "./LoveFlow";
+import { Writing } from "./Writing";
 
-const { concept, frames, hero } = design;
+const { concept, flow, frames, hero } = design;
 
 /**
  * 帯に貼る画像の URL。Next.js の画像最適化を通した、指定の幅のものを返します。
@@ -24,7 +26,7 @@ function textureUrl(src: string, width: number) {
   return props.srcSet?.split(", ")[0]?.split(" ")[0] ?? props.src;
 }
 
-/** /design の本体。最初の画面と、それに続く考え方の紹介を並べます。 */
+/** /design の本体。最初の画面、書かれていく文章、最後に流れる大きな文字を並べます。 */
 export function Design() {
   return (
     <div className={styles.page}>
@@ -42,38 +44,32 @@ export function Design() {
       />
 
       <section className={styles.concept} aria-labelledby="design-concept">
-        <div className={`shell ${styles.conceptInner}`}>
-          <ConceptTitle id="design-concept" words={concept.words} />
+        <div className="shell">
+          <ConceptTitle id="design-concept" title={concept.title} label={concept.label} />
+          <Writing stanzas={concept.stanzas} />
 
-          <div className={styles.conceptBody}>
-            <p className={styles.conceptLead}>{concept.lead}</p>
-            {concept.body.map((paragraph) => (
-              <p key={paragraph} className="lead">
-                {paragraph}
-              </p>
-            ))}
-
-            {/*
-             * 全ページ共通の「開発実績へスキップ」は #project-records へ飛びます。
-             * このページでは、開発実績への入口であるここを、その行き先にしています。
-             */}
-            <div id="project-records" className={styles.actions}>
-              <Link className={`${styles.action} ${styles.actionPrimary}`} href={concept.primary.href}>
-                {concept.primary.label}
-                <span className={styles.actionArrow} aria-hidden="true">
-                  →
-                </span>
-              </Link>
-              <Link className={styles.action} href={concept.secondary.href}>
-                {concept.secondary.label}
-                <span className={styles.actionArrow} aria-hidden="true">
-                  →
-                </span>
-              </Link>
-            </div>
+          {/*
+           * 全ページ共通の「開発実績へスキップ」は #project-records へ飛びます。
+           * このページでは、開発実績への入口であるここを、その行き先にしています。
+           */}
+          <div id="project-records" className={styles.actions}>
+            <Link className={`${styles.action} ${styles.actionPrimary}`} href={concept.primary.href}>
+              {concept.primary.label}
+              <span className={styles.actionArrow} aria-hidden="true">
+                →
+              </span>
+            </Link>
+            <Link className={styles.action} href={concept.secondary.href}>
+              {concept.secondary.label}
+              <span className={styles.actionArrow} aria-hidden="true">
+                →
+              </span>
+            </Link>
           </div>
         </div>
       </section>
+
+      <LoveFlow heavy={flow.heavy} light={flow.light} label={flow.label} />
     </div>
   );
 }

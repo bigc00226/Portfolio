@@ -1,0 +1,73 @@
+/* =========================================================================
+   ページの最後を流れる、大きな文字（/design）
+   ========================================================================= */
+
+.flow {
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(28px, 4vw, 64px) clamp(72px, 10vw, 168px);
+  font-family:
+    var(--font-display), var(--font-jp), ui-sans-serif, system-ui, sans-serif;
+  /* 一つぶんの幅が、いつも画面の幅に近くなるよう、画面の幅に合わせて大きくします。 */
+  font-size: max(5.5rem, 12.8vw);
+  font-feature-settings: normal;
+  line-height: 1.16;
+  color: var(--ink);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* スクロールで余分に流すぶん。LoveFlow.tsx が transform を書き込みます。 */
+.shift {
+  will-change: transform;
+}
+
+/* 同じ文字を並べ、一つぶんだけ左へ流れたら、最初へ戻します。 */
+.track {
+  display: flex;
+  width: max-content;
+  animation: flow 20s linear infinite;
+}
+
+.unit {
+  flex: none;
+  padding-right: 0.36em;
+}
+
+.heavy {
+  font-weight: 900;
+  font-variation-settings: "wdth" 125;
+  letter-spacing: -0.035em;
+}
+
+.light {
+  font-weight: 300;
+  font-variation-settings: "wdth" 112;
+  letter-spacing: -0.03em;
+}
+
+/* 「o」の代わりに置くハート。大文字の高さに合わせます。 */
+.heart {
+  display: inline-block;
+  width: 0.76em;
+  height: 0.72em;
+  margin-inline: 0.03em 0.05em;
+  fill: var(--accent);
+  vertical-align: -0.02em;
+}
+
+/* 始まりと終わりの両方を書いておきます（WebKit は、省くと動かないことがあります）。 */
+@keyframes flow {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(-100% / var(--copies)), 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
+}

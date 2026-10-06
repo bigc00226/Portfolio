@@ -113,6 +113,13 @@ function path(points: readonly Point[]) {
   return d;
 }
 
+/**
+ * 手書きのハートと同じ形。本文の小さな絵と、最後に流れる大きな文字のハートにも
+ * 使います。枠は HEART_BOX のとおりです。
+ */
+export const HEART_PATH = `${path(HEART)} Z`;
+export const HEART_BOX = "-3 -9 107 101";
+
 export type Handwriting = {
   viewBox: string;
   /** ハートの形（左、右）。塗りにも、手書きの線にも使います。 */

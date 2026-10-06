@@ -323,31 +323,69 @@
   display: inline-flex;
 }
 
-/* 考え方の紹介 ------------------------------------------------------------- */
+/* 「愛されるエンジニア」の文章 -------------------------------------------------
+   見出しと、そのあとに続く本文（Writing.tsx）、開発実績などへの入口を並べます。 */
 
 .concept {
+  /* 見出しから本文までの空き。 */
+  --lead-in: clamp(48px, 6vw, 88px);
+
   position: relative;
-  padding-block: clamp(72px, 9vw, 132px) clamp(96px, 12vw, 170px);
+  padding-block: clamp(72px, 9vw, 132px) clamp(56px, 7vw, 104px);
+  /* ペンを持った手が、画面の右へはみ出しても、横にスクロールできないようにします。 */
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
-.conceptInner {
-  display: grid;
-  gap: clamp(36px, 5vw, 72px);
+/*
+ * スクロールで書いていく環境では、本文の前を大きく空けます。見出しが画面の上へ
+ * 来たころに、下から最初の一行が書かれ始めます。切り替わる前から空けておくのは、
+ * 再読み込みのあとに元のスクロール位置へ戻れるようにするためです。
+ */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .concept {
+    --lead-in: clamp(120px, 40svh, 400px);
+  }
+}
+
+/* 幅の狭い、縦長の画面では、その空きを控えめにします。 */
+@media (max-width: 760px) and (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .concept {
+    --lead-in: clamp(96px, 26svh, 280px);
+  }
+}
+
+.conceptHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px 24px;
+  margin-bottom: var(--lead-in);
+  padding-bottom: clamp(14px, 1.6vw, 22px);
+  border-bottom: 1px solid var(--ink);
 }
 
 .conceptTitle {
-  max-width: 60rem;
-  padding-bottom: clamp(14px, 1.6vw, 22px);
-  border-bottom: 1px solid var(--ink);
   font-family:
     var(--font-display), var(--font-jp), ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(1.5rem, 3.3vw, 3.25rem);
   font-weight: 500;
   font-variation-settings: "wdth" 125;
   font-feature-settings: normal;
-  letter-spacing: -0.005em;
-  line-height: 1.12;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
   color: var(--ink);
+}
+
+.conceptLabel {
+  padding-bottom: 0.5em;
+  color: var(--text-mute);
+  transition: opacity 0.95s var(--ease-soft) 0.25s;
+}
+
+.conceptHead:not([data-shown]) .conceptLabel {
+  opacity: 0;
 }
 
 .wordMask {
@@ -363,33 +401,18 @@
   transition:
     transform 0.95s var(--ease),
     opacity 0.95s var(--ease-soft);
-  transition-delay: calc(var(--i) * 90ms);
 }
 
-.conceptTitle[data-shown] .word {
+.conceptHead[data-shown] .word {
   transform: none;
   opacity: 1;
-}
-
-.conceptBody {
-  display: grid;
-  gap: clamp(16px, 1.8vw, 24px);
-  max-width: 44rem;
-  margin-left: auto;
-}
-
-.conceptLead {
-  font-size: clamp(1.125rem, 1.05rem + 0.7vw, 1.625rem);
-  font-weight: 700;
-  line-height: 1.75;
-  color: var(--ink);
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: clamp(14px, 1.8vw, 24px);
+  margin-top: clamp(56px, 7vw, 104px);
   scroll-margin-top: 40vh;
 }
 
@@ -455,10 +478,6 @@
     font-size: 0.625rem;
   }
 
-  .conceptBody {
-    margin-left: 0;
-  }
-
   .action {
     flex: 1 1 100%;
     justify-content: center;
@@ -468,6 +487,10 @@
 @media (prefers-reduced-motion: reduce) {
   .word {
     transform: none;
+    opacity: 1;
+  }
+
+  .conceptHead:not([data-shown]) .conceptLabel {
     opacity: 1;
   }
 }
