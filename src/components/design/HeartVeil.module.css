@@ -1,0 +1,55 @@
+/* =========================================================================
+   流れる大きな文字から、暗い画面へ移る幕（/design）
+   ========================================================================= */
+
+.realm {
+  position: relative;
+  /* 幕（z-index: 1）を、流れる文字より手前、紹介文とギャラリーより奥に挟みます。 */
+  isolation: isolate;
+}
+
+/* 幕は、HeartVeil.tsx が動かせるときにだけ出します。 */
+.track {
+  display: none;
+}
+
+/*
+ * 幕の通り道。包んだ範囲より画面ひとつ分だけ上から始めるので、流れる文字が画面の
+ * 下から入ってくるときには、もう幕が画面ぜんたいに重なっています（はじめは透明）。
+ * 包んだ範囲が終わると、幕も一緒に上へ流れていきます。
+ */
+.realm[data-veil="on"] .track {
+  position: absolute;
+  inset: -100svh 0 0;
+  z-index: 1;
+  display: block;
+  pointer-events: none;
+}
+
+.veil {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* 地の暗さ。--top と --bottom は、HeartVeil.tsx が書きこみます。 */
+.tint {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(28 27 29 / var(--top, 0)),
+    rgb(28 27 29 / var(--bottom, 0))
+  );
+}
+
+/* 広がっていくハート。位置と大きさは、HeartVeil.tsx が path の transform に書きこみます。 */
+.heart {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  fill: var(--night);
+}

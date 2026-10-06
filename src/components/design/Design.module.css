@@ -11,6 +11,8 @@
   --ghost-heart: #f6d9da;
   /* 見出しの字の大きさ。幅と高さの、どちらにも収まるようにします。 */
   --size: min(10.4vw, 15.5svh);
+  /* ページの後半（紹介文と業種のギャラリー）の、暗い地の色。 */
+  --night: #1c1b1d;
 
   position: relative;
   background: var(--raise-1);

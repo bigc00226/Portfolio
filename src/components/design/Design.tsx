@@ -3,30 +3,37 @@ import Link from "next/link";
 
 import { design } from "@/data/design";
 
+import { About } from "./About";
 import { ConceptTitle } from "./ConceptTitle";
 import styles from "./Design.module.css";
 import { DesignHero } from "./DesignHero";
+import { HeartVeil } from "./HeartVeil";
+import { IndustryReel } from "./IndustryReel";
 import { LoveFlow } from "./LoveFlow";
 import { Writing } from "./Writing";
 
-const { concept, flow, frames, hero } = design;
+const { about, concept, flow, frames, hero, industries } = design;
 
 /**
  * 帯に貼る画像の URL。Next.js の画像最適化を通した、指定の幅のものを返します。
  * 差し替えた写真が大きくても、ブラウザへは必要な大きさで届きます。
+ * @param ratio 枠の横と縦の比。
  */
-function textureUrl(src: string, width: number) {
+function textureUrl(src: string, width: number, ratio = 16 / 9) {
   const { props } = getImageProps({
     src,
     alt: "",
     width,
-    height: Math.round((width * 9) / 16),
+    height: Math.round(width / ratio),
   });
   /* srcSet の先頭（1x）が、指定した幅に合わせた画像です。 */
   return props.srcSet?.split(", ")[0]?.split(" ")[0] ?? props.src;
 }
 
-/** /design の本体。最初の画面、書かれていく文章、最後に流れる大きな文字を並べます。 */
+/**
+ * /design の本体。最初の画面、書かれていく文章、流れる大きな文字、
+ * 暗い幕の上の紹介文、業種のギャラリーを、この順に並べます。
+ */
 export function Design() {
   return (
     <div className={styles.page}>
@@ -69,7 +76,19 @@ export function Design() {
         </div>
       </section>
 
-      <LoveFlow heavy={flow.heavy} light={flow.light} label={flow.label} />
+      {/* ここから先は、ハートの幕が背景を受け持ちます。 */}
+      <HeartVeil>
+        <LoveFlow heavy={flow.heavy} light={flow.light} label={flow.label} />
+        <About id="design-about" label={about.label} paragraphs={about.paragraphs} />
+        <IndustryReel
+          heading={industries.heading}
+          items={industries.items.map((item) => ({
+            ...item,
+            large: textureUrl(item.image.src, 1080, 13 / 8),
+            small: textureUrl(item.image.src, 640, 13 / 8),
+          }))}
+        />
+      </HeartVeil>
     </div>
   );
 }

@@ -191,7 +191,7 @@ function track(column: number, progress: number) {
 }
 
 /** WebGL2 が使えるかどうかを、使い捨てのキャンバスで確かめます。 */
-function canUseWebGL() {
+export function canUseWebGL() {
   try {
     const context = document.createElement("canvas").getContext("webgl2");
     context?.getExtension("WEBGL_lose_context")?.loseContext();

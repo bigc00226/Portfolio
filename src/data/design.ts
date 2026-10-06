@@ -8,6 +8,21 @@ import frame05 from "@/images/design/05.jpg";
 import frame06 from "@/images/design/06.jpg";
 import frame07 from "@/images/design/07.jpg";
 import frame08 from "@/images/design/08.jpg";
+import imgAgriculture from "@/images/design/industries/agriculture.jpg";
+import imgCare from "@/images/design/industries/care.jpg";
+import imgEducation from "@/images/design/industries/education.jpg";
+import imgEnergy from "@/images/design/industries/energy.jpg";
+import imgFinance from "@/images/design/industries/finance.jpg";
+import imgGovernment from "@/images/design/industries/government.jpg";
+import imgHealthcare from "@/images/design/industries/healthcare.jpg";
+import imgLogistics from "@/images/design/industries/logistics.jpg";
+import imgManufacturing from "@/images/design/industries/manufacturing.jpg";
+import imgMedia from "@/images/design/industries/media.jpg";
+import imgOperations from "@/images/design/industries/operations.jpg";
+import imgProperty from "@/images/design/industries/property.jpg";
+import imgResearch from "@/images/design/industries/research.jpg";
+import imgRetail from "@/images/design/industries/retail.jpg";
+import imgSecurity from "@/images/design/industries/security.jpg";
 
 /**
  * /design のページに出てくる文言と画像をまとめています。
@@ -22,6 +37,19 @@ export type DesignFrame = {
   image: StaticImageData;
   /** 画像の説明。飾りとして扱う場合は空のままにします。 */
   alt: string;
+};
+
+/** 横に流れるギャラリーの一枚。 */
+export type DesignIndustry = {
+  id: string;
+  /**
+   * 大きく出す業種名。長い名前は、行ごとに分けて書きます。
+   * 行をつなげたものが、業種名そのものになるようにしてください。
+   */
+  lines: readonly string[];
+  /** 画像の下に小さく添える欧文。 */
+  caption: string;
+  image: StaticImageData;
 };
 
 /** 大きな字の色。 */
@@ -172,5 +200,54 @@ export const design = {
     light: "Apple",
     /** 読み上げに使う、ふつうの綴り。 */
     label: "Love Apple",
+  },
+
+  /**
+   * 流れる大きな文字のあと、暗いハートが広がって画面を覆い、その上に現れる紹介文。
+   * label は小見出し、paragraphs は本文です（段落ごとに、行を並べます）。
+   */
+  about: {
+    label: "LOVE APPLE — TECHNOLOGY × DESIGN × DEVELOPMENT",
+    paragraphs: [
+      [
+        "Love Appleは、両親から受け継いだウェブ制作とシステム開発の知識を原点に、",
+        "留学時代や開発会社で培ったシステム開発・アプリ開発・AI開発の経験を活かし、",
+        "これまで15種類の業種にわたるさまざまなプロジェクトに携わってきました。",
+      ],
+      [
+        "Webサイトから業務システム、アプリ、AIまで、",
+        "業種や課題に合わせて技術を組み合わせ、",
+        "アイデアを具体的なカタチへと変えていきます。",
+      ],
+    ],
+  },
+
+  /**
+   * 紹介文のあと、横に流れていく 15 の業種。並びは、トップページの開発実績と同じです。
+   *
+   * 画像は、本番の写真が用意できるまでの仮の絵です。src/images/design/industries/ の
+   * 同じ名前のファイルを上書きすれば、そのまま差し替わります。枠は 13:8 です。
+   * 比率の違う写真は、ゆがめずに、枠いっぱいになるよう切り抜いて表示します。
+   */
+  industries: {
+    /** 読み上げに使う、この区画の見出し。 */
+    heading: "これまでに携わってきた15の業種",
+    items: [
+      { id: "agriculture", lines: ["農林水産業"], caption: "AGRICULTURE, FORESTRY & FISHERIES", image: imgAgriculture },
+      { id: "manufacturing", lines: ["製造業"], caption: "MANUFACTURING", image: imgManufacturing },
+      { id: "retail", lines: ["小売・EC・飲食"], caption: "RETAIL, E-COMMERCE & FOOD", image: imgRetail },
+      { id: "healthcare", lines: ["医療・", "ヘルスケア"], caption: "MEDICAL & HEALTHCARE", image: imgHealthcare },
+      { id: "care", lines: ["介護・福祉"], caption: "NURSING CARE & WELFARE", image: imgCare },
+      { id: "government", lines: ["行政・公共"], caption: "GOVERNMENT & PUBLIC SERVICES", image: imgGovernment },
+      { id: "education", lines: ["教育"], caption: "EDUCATION", image: imgEducation },
+      { id: "finance", lines: ["金融・保険"], caption: "FINANCE & INSURANCE", image: imgFinance },
+      { id: "logistics", lines: ["物流・運輸・", "モビリティ"], caption: "LOGISTICS, TRANSPORT & MOBILITY", image: imgLogistics },
+      { id: "property", lines: ["不動産・建設"], caption: "REAL ESTATE & CONSTRUCTION", image: imgProperty },
+      { id: "energy", lines: ["エネルギー・", "環境"], caption: "ENERGY & ENVIRONMENT", image: imgEnergy },
+      { id: "operations", lines: ["バックオフィス・", "経営管理"], caption: "BACK OFFICE & MANAGEMENT", image: imgOperations },
+      { id: "media", lines: ["メディア・", "エンタメ・スポーツ"], caption: "MEDIA, ENTERTAINMENT & SPORTS", image: imgMedia },
+      { id: "security", lines: ["セキュリティ・", "インフラ"], caption: "SECURITY & INFRASTRUCTURE", image: imgSecurity },
+      { id: "research", lines: ["研究・科学・", "分野横断AI"], caption: "RESEARCH, SCIENCE & CROSS-DOMAIN AI", image: imgResearch },
+    ] satisfies DesignIndustry[],
   },
 } as const;

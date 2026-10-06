@@ -1,0 +1,254 @@
+/* =========================================================================
+   業種のギャラリー（/design）
+   湾曲した画像の帯が右から左へ流れ、中央に来た画像の業種名が大きく出ます。
+   ========================================================================= */
+
+.reel {
+  /*
+   * 基準の長さ。画像の大きさも、字の大きさも、これに合わせます。
+   * 横長の画面では画面の幅（縦に余裕があれば 2 割まで大きく）、縦長の画面では
+   * 高さから決めます。reelShape.ts の unitOf と同じ式です。
+   */
+  --u: max(100vw, min(110svh, 220vw), min(max(100vw, 215.2svh), 120vw));
+
+  position: relative;
+  z-index: 2;
+  color: #ffffff;
+  background: var(--night);
+}
+
+/* ハートの幕（HeartVeil.tsx）が背景を受け持つあいだは、自分の背景を外します。 */
+:global([data-veil="on"]) .reel {
+  background: transparent;
+}
+
+/* 動かない状態：画像と業種名の一覧 -------------------------------------------
+   サーバーが返す HTML はこの形です。JavaScript を無効にしている方、
+   「視差効果を減らす」設定の方、WebGL が使えない環境の方には、このままお見せします。 */
+
+.stage {
+  position: relative;
+  padding-block: clamp(56px, 7vw, 104px) clamp(72px, 9vw, 140px);
+}
+
+.canvas,
+.hud {
+  display: none;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  gap: clamp(28px, 3vw, 44px) clamp(16px, 2vw, 28px);
+  list-style: none;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  align-items: baseline;
+}
+
+.thumb {
+  position: relative;
+  grid-column: 1 / -1;
+  aspect-ratio: 13 / 8;
+  margin-bottom: 10px;
+  overflow: hidden;
+  background: #2a292c;
+}
+
+.thumb img {
+  object-fit: cover;
+}
+
+.cardNumber {
+  font-family:
+    var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  font-variation-settings: "wdth" 125;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.cardName {
+  font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.375rem);
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+.cardCaption {
+  grid-column: 2;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/*
+ * スクロールで動かす状態へ切り替わる環境では、切り替わる前から、高さを取って
+ * おきます。再読み込みのあとに元のスクロール位置へ戻れるようにするためです。
+ */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .reel:not(.cinema):not([data-reel="off"]) {
+    min-height: calc(100svh + var(--u) * var(--travel) / var(--rate));
+  }
+}
+
+/* スクロールで動かす状態 ------------------------------------------------------
+   舞台を画面に固定し、スクロール量を IndustryReel.tsx が帯の流れに置き換えます。
+   帯の流れる長さ（--travel）を速さ（--rate）で割ったぶんだけ、固定しておきます。 */
+
+.cinema {
+  height: calc(100svh + var(--u) * var(--travel) / var(--rate));
+}
+
+.cinema .stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  padding: 0;
+}
+
+/*
+ * 舞台が下から上がってくるあいだ、IndustryReel.tsx がキャンバスを上へずらして、
+ * 画像を画面の同じ高さに保ちます。そのあいだは前の区画に重なるので、ポインターは
+ * 素通りさせます（どの画像の上にあるかは、舞台のほうで調べています）。
+ */
+.cinema .canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cinema .hud {
+  /* 下端の目盛りを置く高さ。 */
+  --base: clamp(18px, 3.2svh, 30px);
+
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  /* 業種名が切り替わるたびの組み直しを、この枠の中だけで済ませます。 */
+  contain: strict;
+}
+
+/* 一覧は、読み上げのために残し、目には見せません。画像は読みこませません。 */
+.cinema .cards {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cinema .thumb {
+  display: none;
+}
+
+/*
+ * 大きな業種名。下の端を、画像の上の端に少し重ねます（0.1055 が画像の高さの半分）。
+ * 字は、基準の長さに合わせつつ（--size が割合）、いちばん長い行（--n 文字ぶん）が
+ * 画面に収まる大きさまでに抑えます。どちらも IndustryReel.tsx が業種ごとに渡します。
+ */
+.title {
+  position: absolute;
+  inset-inline: 0;
+  bottom: calc(50% + var(--u) * (0.1055 - 0.04));
+  display: grid;
+  justify-items: center;
+  font-family:
+    var(--font-display), var(--font-jp), ui-sans-serif, system-ui, sans-serif;
+  font-size: min(calc(var(--u) * var(--size)), calc(86vw / var(--n)));
+  font-weight: 900;
+  font-variation-settings: "wdth" 125;
+  letter-spacing: 0;
+  line-height: 1.12;
+  white-space: nowrap;
+  color: #ffffff;
+}
+
+.titleLine {
+  display: block;
+}
+
+.titleChar {
+  display: inline-block;
+  animation: charIn 0.55s var(--ease) both;
+  animation-delay: calc(var(--i) * 34ms);
+}
+
+/* 始まりと終わりの両方を書いておきます（WebKit は、省くと動かないことがあります）。 */
+@keyframes charIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.32em, 0) rotate(5deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+/* 画像のすぐ下に添える欧文。 */
+.caption {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(50% + var(--u) * (0.1055 + 0.014));
+  padding-inline: 16px;
+  font-size: clamp(0.6875rem, 0.6rem + 0.24vw, 0.875rem);
+  text-align: center;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.number {
+  position: absolute;
+  inset-inline: 0;
+  bottom: calc(var(--base) + 64px);
+  font-family:
+    var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.25rem, 1rem + 0.9vw, 2rem);
+  font-weight: 800;
+  font-variation-settings: "wdth" 125;
+  line-height: 1;
+  text-align: center;
+}
+
+/* 中央の針と、帯と一緒に流れる目盛り。 */
+.needle {
+  position: absolute;
+  bottom: var(--base);
+  left: 50%;
+  width: 2px;
+  height: 52px;
+  margin-left: -1px;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.scale {
+  position: absolute;
+  inset-inline: 0;
+  bottom: var(--base);
+  height: 16px;
+  overflow: hidden;
+}
+
+/*
+ * 目盛りは、一本ぶんの絵を横に並べて描きます（くり返しのグラデーションは、WebKit で
+ * 間隔が乱れます）。間隔の 14px は、IndustryReel.tsx の TICK と合わせます。
+ */
+.ruler {
+  position: absolute;
+  inset: 0 -28px;
+  background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1.5px, transparent 1.5px);
+  background-size: 14px 100%;
+  background-repeat: repeat-x;
+}
