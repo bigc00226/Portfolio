@@ -7,7 +7,7 @@ import { useIsomorphicLayoutEffect } from "@/components/useInView";
 
 import styles from "./IndustryReel.module.css";
 import type { Reel } from "./reel";
-import { PITCH, START, SWITCH, drumOf, travelOf, unitOf } from "./reelShape";
+import { HURRY, PITCH, START, SWITCH, drumOf, runOf, travelOf, unitOf } from "./reelShape";
 
 const MOTION_OK = "(prefers-reduced-motion: no-preference)";
 
@@ -139,6 +139,7 @@ export function IndustryReel({ heading, items }: Props) {
 
     const count = items.length;
     const travel = travelOf(count);
+    const run = runOf(count);
 
     let reel: Reel | null = null;
     let loading = false;
@@ -179,8 +180,13 @@ export function IndustryReel({ heading, items }: Props) {
     const read = () => -section.getBoundingClientRect().top;
 
     const draw = (scrolled: number, elapsed: number) => {
-      /* 最初の画像の中心の位置。固定する前から流れはじめ、固定が外れたあとも流れつづけます。 */
-      const first = (START - (scrolled / pin) * travel) * unit;
+      /*
+       * 最初の画像の中心の位置。固定する前から流れはじめ、固定が外れたあとも流れつづけます。
+       * 最後の画像が中央を過ぎたあとは、少し速く流します。
+       */
+      const paced = (scrolled / pin) * travel;
+      const flowed = paced <= run ? paced : run + (paced - run) * HURRY;
+      const first = (START - flowed) * unit;
       const pitch = PITCH * unit;
 
       /* 流れる勢いに合わせて、画像をたわませます。 */
@@ -350,7 +356,7 @@ export function IndustryReel({ heading, items }: Props) {
       ref={sectionRef}
       className={cinema ? `${styles.reel} ${styles.cinema}` : styles.reel}
       style={{ "--travel": travelOf(items.length).toFixed(3), "--rate": RATE } as CSSProperties}
-      data-reel={failed ? "off" : undefined}
+      data-reel={failed ? "off" : cinema ? "on" : undefined}
       aria-labelledby="design-industries"
     >
       <h2 id="design-industries" className="u-sr-only">

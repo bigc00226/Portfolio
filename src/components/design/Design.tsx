@@ -1,18 +1,37 @@
+import { Instrument_Serif } from "next/font/google";
 import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 
 import { design } from "@/data/design";
+import { site } from "@/data/site";
+import logo from "@/images/logo.png";
 
 import { About } from "./About";
+import { AboutCards } from "./AboutCards";
 import { ConceptTitle } from "./ConceptTitle";
+import { Contact } from "./Contact";
 import styles from "./Design.module.css";
+import { DesignFooter } from "./DesignFooter";
 import { DesignHero } from "./DesignHero";
 import { HeartVeil } from "./HeartVeil";
 import { IndustryReel } from "./IndustryReel";
 import { LoveFlow } from "./LoveFlow";
+import { Records } from "./Records";
+import { SmoothWheel } from "./SmoothWheel";
+import { WorkWall } from "./WorkWall";
 import { Writing } from "./Writing";
 
-const { about, concept, flow, frames, hero, industries } = design;
+const { about, concept, contact, flow, footer, frames, hero, industries, profile, records, work } =
+  design;
+
+/** 「仕事の進め方」の見出しで、一部の語に使う、明朝の斜体。このページでだけ読みこみます。 */
+const serif = Instrument_Serif({
+  weight: "400",
+  style: "italic",
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+});
 
 /**
  * 帯に貼る画像の URL。Next.js の画像最適化を通した、指定の幅のものを返します。
@@ -31,12 +50,13 @@ function textureUrl(src: string, width: number, ratio = 16 / 9) {
 }
 
 /**
- * /design の本体。最初の画面、書かれていく文章、流れる大きな文字、
- * 暗い幕の上の紹介文、業種のギャラリーを、この順に並べます。
+ * /design の本体。最初の画面、書かれていく文章、流れる大きな文字、暗い幕の上の紹介文、
+ * 業種のギャラリー、ABOUT のカード、仕事の進め方、開発実績、ご相談の入口、
+ * いちばん下の案内を、この順に並べます。
  */
 export function Design() {
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${serif.variable}`}>
       <DesignHero
         copy={hero}
         frames={frames.map((frame) => ({
@@ -89,6 +109,58 @@ export function Design() {
           }))}
         />
       </HeartVeil>
+
+      <AboutCards
+        id="design-profile"
+        title={profile.title}
+        lead={profile.lead}
+        more={profile.more}
+        cards={profile.cards}
+      />
+
+      <WorkWall
+        id="design-work"
+        label={work.label}
+        statement={work.statement}
+        title={work.title}
+        button={work.button}
+        near={work.near}
+        far={work.far}
+      />
+
+      <Records
+        id="design-records"
+        title={records.title}
+        heading={records.heading}
+        items={records.items}
+        tags={records.tags}
+        hover={records.hover}
+        button={records.button}
+      />
+
+      {/* ここから下は、黒い地です。 */}
+      <div className={styles.tail}>
+        <Contact
+          id="design-contact"
+          title={contact.title}
+          words={contact.words}
+          lead={contact.lead}
+          links={contact.links}
+        />
+        <LoveFlow heavy={flow.heavy} light={flow.light} label={flow.label} dark />
+        <DesignFooter
+          name={site.name}
+          logo={logo}
+          columns={footer.columns}
+          strip={footer.strip}
+          touch={footer.touch}
+          socials={contact.links.map((link) => ({ label: link.label, href: link.href }))}
+          backToTop={footer.backToTop}
+        />
+      </div>
+
+      {/* ホイールでのスクロールを、なめらかにします（このページだけ）。 */}
+      <SmoothWheel />
     </div>
   );
 }

@@ -1,0 +1,238 @@
+/* =========================================================================
+   開発実績の紹介（/design）
+   大きな見出しが左右から寄ってきて、途中で、地の色が明るく切り替わります。
+   ========================================================================= */
+
+.records {
+  /* 地と字の色。動かない状態では、明るい地です。 */
+  --ground: var(--raise-1);
+  --type: var(--ink);
+
+  position: relative;
+  z-index: 2;
+  padding-block: clamp(64px, 6vw, 120px) clamp(72px, 11vw, 212px);
+  overflow-x: hidden;
+  overflow-x: clip;
+  color: var(--type);
+  background: var(--ground);
+}
+
+/*
+ * スクロールで動かす状態では、暗い地から始めます。Records.tsx が data-lit を付けると、
+ * 明るい地へ切り替わります（上へ戻ると、また暗くなります）。
+ */
+.records[data-live] {
+  --ground: var(--night);
+  --type: #ffffff;
+
+  transition:
+    background-color 0.45s var(--ease-soft),
+    color 0.45s var(--ease-soft);
+}
+
+.records[data-live][data-lit] {
+  --ground: var(--raise-1);
+  --type: var(--ink);
+}
+
+/* 切り替わる前から暗くしておき、読みこみの瞬間に、明るい地が見えないようにします。 */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .records:not([data-lit]) {
+    --ground: var(--night);
+    --type: #ffffff;
+  }
+}
+
+.title {
+  display: grid;
+  justify-items: center;
+  font-family:
+    var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  /* 長いほうの行が、画面の幅の 8 割ほどになる大きさです。 */
+  font-size: 13.4vw;
+  font-weight: 800;
+  font-variation-settings: "wdth" 125;
+  font-feature-settings: normal;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+  white-space: nowrap;
+}
+
+.line {
+  display: block;
+  will-change: transform;
+}
+
+/* 三件の実績。中央の一件は、大きく、少し下げて置きます。 */
+.cards {
+  display: grid;
+  grid-template-columns: 472fr 720fr 472fr;
+  gap: 2.24vw;
+  align-items: start;
+  margin: 10.4vw 2.76vw 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card:nth-child(2) {
+  margin-top: 2.24vw;
+}
+
+.link {
+  display: grid;
+  gap: clamp(8px, 0.9vw, 16px);
+}
+
+.thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 472 / 265;
+  margin-bottom: clamp(8px, 1vw, 20px);
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--raise-3);
+}
+
+.card:nth-child(2) .thumb {
+  aspect-ratio: 720 / 405;
+}
+
+.thumb img {
+  object-fit: cover;
+  transition: transform 0.9s var(--ease);
+}
+
+/* ポインターを載せると、画像が少し暗くなり、中央に小さな札が出ます。 */
+.thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 11, 11, 0.36);
+  opacity: 0;
+  transition: opacity 0.35s var(--ease-soft);
+}
+
+.hover {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  padding: 0.7em 1.5em;
+  border-radius: var(--radius-pill);
+  font-family:
+    var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(0.75rem, 0.5rem + 0.4vw, 1rem);
+  font-weight: 700;
+  font-variation-settings: "wdth" 125;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--ink);
+  background: #ffffff;
+  opacity: 0;
+  transform: translate(-50%, -30%);
+  transition:
+    opacity 0.35s var(--ease-soft),
+    transform 0.5s var(--ease);
+}
+
+.link:hover .thumb::after,
+.link:focus-visible .thumb::after {
+  opacity: 1;
+}
+
+.link:hover .hover,
+.link:focus-visible .hover {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+.link:hover .thumb img {
+  transform: scale(1.04);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.no {
+  margin-right: 8px;
+  font-family:
+    var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(0.8125rem, 0.6rem + 0.36vw, 1.0625rem);
+  font-weight: 500;
+  font-variation-settings: "wdth" 125;
+  line-height: 1;
+}
+
+.tag {
+  padding: 0.5em 1.1em;
+  border-radius: 5px;
+  font-family:
+    var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(0.6875rem, 0.5rem + 0.34vw, 1rem);
+  font-weight: 600;
+  font-variation-settings: "wdth" 112;
+  line-height: 1;
+  color: #ffffff;
+  background: #00a56f;
+}
+
+.tag[data-tag="app"] {
+  background: #f06a25;
+}
+
+.tag[data-tag="ai"] {
+  background: #0f6cbd;
+}
+
+.name {
+  margin-top: clamp(4px, 0.6vw, 12px);
+  font-size: clamp(1rem, 0.7rem + 0.68vw, 1.4375rem);
+  font-weight: 700;
+  font-feature-settings: normal;
+  letter-spacing: 0.04em;
+  line-height: 1.55;
+}
+
+.industry {
+  font-size: clamp(0.75rem, 0.62rem + 0.24vw, 0.9375rem);
+  line-height: 1.5;
+  opacity: 0.6;
+}
+
+/* ボタン（MoreButton.tsx）。 */
+.records .more {
+  margin: 5vw auto 0;
+}
+
+/* スクロールで動かす状態：画像は、下から浮かび上がります（--risen が現れた割合）。 */
+.records[data-live] .card {
+  opacity: var(--risen, 1);
+  transform: translate3d(0, calc((1 - var(--risen, 1)) * 60px), 0);
+}
+
+/* 画面幅への対応 --------------------------------------------------------- */
+
+@media (max-width: 760px) {
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    margin: 18vw var(--gutter) 0;
+  }
+
+  .card:nth-child(2) {
+    margin-top: 0;
+  }
+
+  .card:nth-child(2) .thumb {
+    aspect-ratio: 472 / 265;
+  }
+
+  .records .more {
+    width: calc(100% - var(--gutter) * 2);
+    margin-top: 48px;
+  }
+}

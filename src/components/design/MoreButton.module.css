@@ -1,0 +1,62 @@
+/* =========================================================================
+   色の付いた四角いボタン（/design の「MORE DETAILS」）
+   色は、親の要素か、MoreButton.tsx が渡す --tone で決まります。
+   ========================================================================= */
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  /* 文言が長くても、白い丸がはみ出さないよう、中身に合わせて広げます。 */
+  width: max-content;
+  min-width: max(240px, 20vw);
+  height: 5vw;
+  min-height: 64px;
+  padding-inline: clamp(18px, 1.7vw, 34px) clamp(10px, 1.55vw, 30px);
+  border-radius: 6px;
+  font-family:
+    var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1rem, 0.6rem + 0.9vw, 1.6875rem);
+  font-weight: 700;
+  font-variation-settings: "wdth" 125;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  white-space: nowrap;
+  color: #ffffff;
+  background: var(--tone, var(--ink));
+  transition:
+    filter 0.3s var(--ease-soft),
+    transform 0.45s var(--ease);
+}
+
+.button:hover {
+  filter: brightness(1.07);
+  transform: translateY(-2px);
+}
+
+.icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: max(44px, 3.75vw);
+  height: max(44px, 3.75vw);
+  border-radius: 50%;
+  color: var(--tone, var(--ink));
+  background: #ffffff;
+  transition: transform 0.45s var(--ease);
+}
+
+.icon svg {
+  width: 46%;
+  height: 46%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.button:hover .icon {
+  transform: translateX(4px);
+}

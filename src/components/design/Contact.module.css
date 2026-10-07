@@ -1,0 +1,153 @@
+/* =========================================================================
+   ご相談の入口（/design）
+   ========================================================================= */
+
+.contact {
+  position: relative;
+  min-height: 45.8vw;
+  overflow: hidden;
+  color: #ffffff;
+}
+
+/* 背景に大きく並べる語。地より、わずかに明るい色で組みます。 */
+.words {
+  position: absolute;
+  inset: 1.4vw 0 auto;
+  display: grid;
+  justify-items: center;
+  font-family:
+    var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: 14.2vw;
+  font-weight: 800;
+  font-variation-settings: "wdth" 125;
+  font-feature-settings: normal;
+  letter-spacing: -0.02em;
+  line-height: 0.978;
+  white-space: nowrap;
+  color: #1a1a1a;
+  user-select: none;
+}
+
+.words span {
+  display: block;
+}
+
+.front {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  padding: 9.9vw var(--gutter) 9vw;
+  text-align: center;
+}
+
+.title {
+  position: relative;
+  font-family:
+    var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(3rem, 8.2vw, 10rem);
+  font-weight: 800;
+  font-variation-settings: "wdth" 125;
+  font-feature-settings: normal;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.mascot {
+  position: absolute;
+  top: -0.22em;
+  left: -0.26em;
+  width: 0.5em;
+  height: auto;
+  overflow: visible;
+  transform: rotate(-12deg);
+}
+
+.lead {
+  margin-top: clamp(20px, 3.4vw, 64px);
+  font-size: clamp(0.875rem, 0.6rem + 0.62vw, 1.25rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(12px, 1.4vw, 28px);
+  margin-top: clamp(28px, 4.9vw, 94px);
+  padding: 0;
+  list-style: none;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.36em;
+  height: 1.78em;
+  padding-inline: 1em 0.9em;
+  border: 1.5px solid #ffffff;
+  border-radius: var(--radius-pill);
+  font-family:
+    var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.25rem, 2.8vw, 3.375rem);
+  font-weight: 700;
+  font-variation-settings: "wdth" 125;
+  letter-spacing: -0.005em;
+  line-height: 1;
+  white-space: nowrap;
+  color: #ffffff;
+  background: #000000;
+  transition:
+    color 0.35s var(--ease-soft),
+    background 0.35s var(--ease-soft);
+}
+
+.pill svg {
+  width: 0.9em;
+  height: 0.9em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.45s var(--ease);
+}
+
+.pill:hover {
+  color: #000000;
+  background: #ffffff;
+}
+
+.pill:hover svg {
+  transform: translateX(0.18em);
+}
+
+.pill:focus-visible {
+  outline-color: #ffffff;
+}
+
+@media (max-width: 760px) {
+  .contact {
+    min-height: 0;
+  }
+
+  .front {
+    padding-block: 22vw 20vw;
+  }
+
+  .title {
+    font-size: 13vw;
+  }
+
+  .links {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pill {
+    font-size: 7vw;
+  }
+}

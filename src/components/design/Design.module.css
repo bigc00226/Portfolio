@@ -18,6 +18,22 @@
   background: var(--raise-1);
 }
 
+/*
+ * このページには、専用の案内（DesignFooter.tsx）があるので、全ページ共通の
+ * フッターは隠します。:has() に対応していない環境では、そのまま下に並びます。
+ */
+:global(#page):has(.page) > :global(footer) {
+  display: none;
+}
+
+/* ページのいちばん下（ご相談の入口、流れる文字、案内）の、黒い地。 */
+.tail {
+  position: relative;
+  z-index: 2;
+  color: #ffffff;
+  background: #000000;
+}
+
 /* 最初の画面：動かない状態 ---------------------------------------------------
    サーバーが返す HTML はこの形です。JavaScript を無効にしている方と、
    「視差効果を減らす」設定の方には、このままお見せします。 */

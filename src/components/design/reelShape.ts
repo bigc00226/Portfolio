@@ -29,13 +29,27 @@ export const LIMIT = Math.acos(RADIUS / (RADIUS + FOCUS));
 
 /** 画面を固定した瞬間に、最初の画像の中心がある位置。 */
 export const START = 0.156;
-/** 最後の画像の中心がここまで来たら、固定を終えます。 */
-export const EXIT = -0.42;
+/**
+ * 最後の画像の中心がここまで来たら、固定を終えます。画像が左の端へ流れきるまで
+ * 固定を続け、そのあいだに、次の区画の見出し（ABOUT）が右から入ってきます。
+ */
+export const EXIT = -1.13;
+/**
+ * 最後の画像が中央を過ぎたあとは、帯を、この倍率だけ速く流します。
+ * 画像が左へ抜けていくのと、次の見出しが入ってくるのとが、ちょうど入れ替わります。
+ */
+export const HURRY = 1.22;
 /** 画像の中心がここを左へ越えたら、その業種名に切り替えます。 */
 export const SWITCH = 0.068;
 
-/** 固定しているあいだに、帯が流れる長さ。 */
-export const travelOf = (count: number) => START + (count - 1) * PITCH - EXIT;
+/** 最後の画像が中央に来るまでに、帯が流れる長さ。 */
+export const runOf = (count: number) => START + (count - 1) * PITCH;
+
+/**
+ * 画面を固定しておく長さを決める数。帯が流れる長さを、ふつうの速さで流したときの
+ * 長さに直したものです（速く流す区間は、そのぶん短く数えます）。
+ */
+export const travelOf = (count: number) => runOf(count) - EXIT / HURRY;
 
 /**
  * 円筒の長さ。横長の画面では画面の幅です。縦長の画面では、画像が小さくなりすぎない

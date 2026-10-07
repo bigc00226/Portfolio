@@ -17,6 +17,12 @@
   user-select: none;
 }
 
+/* 黒い地に、白い字で組む場合（ページのいちばん下）。 */
+.dark {
+  padding-block: clamp(20px, 2.6vw, 48px);
+  color: #ffffff;
+}
+
 /* スクロールで余分に流すぶん。LoveFlow.tsx が transform を書き込みます。 */
 .shift {
   will-change: transform;

@@ -23,6 +23,28 @@ import imgProperty from "@/images/design/industries/property.jpg";
 import imgResearch from "@/images/design/industries/research.jpg";
 import imgRetail from "@/images/design/industries/retail.jpg";
 import imgSecurity from "@/images/design/industries/security.jpg";
+import sceneAi from "@/images/design/scenes/ai.jpg";
+import sceneCloud from "@/images/design/scenes/cloud.jpg";
+import sceneCode from "@/images/design/scenes/code.jpg";
+import sceneDashboard from "@/images/design/scenes/dashboard.jpg";
+import sceneDesign from "@/images/design/scenes/design.jpg";
+import sceneHearing from "@/images/design/scenes/hearing.jpg";
+import sceneLaunch from "@/images/design/scenes/launch.jpg";
+import sceneMobile from "@/images/design/scenes/mobile.jpg";
+import sceneSketch from "@/images/design/scenes/sketch.jpg";
+import sceneSupport from "@/images/design/scenes/support.jpg";
+import sceneTest from "@/images/design/scenes/test.jpg";
+import sceneTrust from "@/images/design/scenes/trust.jpg";
+import stripSkillTile from "@/images/design/strips/skill-tile.jpg";
+import stripSkillWide from "@/images/design/strips/skill-wide.jpg";
+import stripStoryTile from "@/images/design/strips/story-tile.jpg";
+import stripStoryWide from "@/images/design/strips/story-wide.jpg";
+import stripValuesTile from "@/images/design/strips/values-tile.jpg";
+import stripValuesWide from "@/images/design/strips/values-wide.jpg";
+import stripVoiceTile from "@/images/design/strips/voice-tile.jpg";
+import stripVoiceWide from "@/images/design/strips/voice-wide.jpg";
+
+import { allProjects, industries, totalIndustries, totalProjects, type Discipline } from "./projects";
 
 /**
  * /design のページに出てくる文言と画像をまとめています。
@@ -49,6 +71,40 @@ export type DesignIndustry = {
   lines: readonly string[];
   /** 画像の下に小さく添える欧文。 */
   caption: string;
+  image: StaticImageData;
+};
+
+/** 白いカードの差し色。見出しの色の字、ボタン、小さな札に使います。 */
+export type CardTone = "green" | "yellow" | "orange" | "blue";
+
+/** 白いカードの見出しに並べる部品。字か、絵です。 */
+export type CardPart =
+  | { text: string; /** 差し色で組みます。 */ tinted?: boolean }
+  | { image: StaticImageData; /** 幅の決め方。fill は、行の残りの幅いっぱいに広げます。 */ size: "tile" | "fill" };
+
+/** 白いカードの一枚ぶん。 */
+export type DesignCard = {
+  id: string;
+  tone: CardTone;
+  /** 大きな見出し。二行で、それぞれに字と絵を並べます。 */
+  rows: readonly [readonly CardPart[], readonly CardPart[]];
+  /** 読み上げと、動かない表示で使う見出し。 */
+  heading: string;
+  /** 説明文。行ごとに分けて書きます。 */
+  text: readonly string[];
+  /** ボタンの行き先。 */
+  href: string;
+  /** 見出しのまわりに貼る、小さな丸い札。 */
+  badges: readonly [ConceptIcon, ConceptIcon];
+};
+
+/** 開発実績から選んで並べる一件。 */
+export type DesignRecord = {
+  id: string;
+  /** 業種名。 */
+  industry: string;
+  title: string;
+  disciplines: readonly Discipline[];
   image: StaticImageData;
 };
 
@@ -85,6 +141,21 @@ export type ConceptLine =
       /** 黄色いマーカーの下線を引きます。 */
       marker?: boolean;
     };
+
+/** 開発実績（projects.ts）から、番号で一件を選びます。画像は、その業種のものを使います。 */
+function record(id: string, image: StaticImageData): DesignRecord {
+  const project = allProjects.find((item) => item.id === id);
+  const group = industries.find((item) => item.projects.some((entry) => entry.id === id));
+  if (!project || !group) throw new Error(`開発実績 ${id} が見つかりません。`);
+
+  return {
+    id,
+    industry: group.name,
+    title: project.title,
+    disciplines: project.disciplines,
+    image,
+  };
+}
 
 export const design = {
   /** ブラウザのタブと、検索結果・SNS のリンクに出る文言。 */
@@ -249,5 +320,205 @@ export const design = {
       { id: "security", lines: ["セキュリティ・", "インフラ"], caption: "SECURITY & INFRASTRUCTURE", image: imgSecurity },
       { id: "research", lines: ["研究・科学・", "分野横断AI"], caption: "RESEARCH, SCIENCE & CROSS-DOMAIN AI", image: imgResearch },
     ] satisfies DesignIndustry[],
+  },
+
+  /**
+   * 業種のギャラリーの最後に、右から入ってくる見出しと、そのあとに重なる白いカード。
+   * カードは画面に固定され、スクロールすると、見出しが一枚ずつ切り替わります。
+   *
+   * 見出しの絵は、仮の絵です。src/images/design/strips/ の同じ名前のファイルを
+   * 上書きすれば、そのまま差し替わります（横長の絵は 5:1、小さな絵も 5:1 で、
+   * 枠に合わせて切り抜きます）。
+   */
+  profile: {
+    title: "ABOUT",
+    /** 見出しの下に添える二行。 */
+    lead: ["Not just an engineer who builds systems,", "but one you can rely on, again and again."],
+    /** ボタンの文言。どのカードでも同じです。 */
+    more: "MORE DETAILS",
+    cards: [
+      {
+        id: "promise",
+        tone: "green",
+        heading: "PROMISE & VALUES",
+        rows: [
+          [{ text: "PROMISE" }, { text: "&", tinted: true }, { image: stripValuesTile, size: "tile" }],
+          [{ image: stripValuesWide, size: "fill" }, { text: "VALUES", tinted: true }],
+        ],
+        text: [
+          "ただシステムを作るのではなく、なぜ作るのか、誰のために作るのか。",
+          "技術だけでなく、デザインや使いやすさ、運用まで考えて、",
+          "「この人にお願いしたい」と思っていただける仕事を大切にしています。",
+        ],
+        href: "#design-concept",
+        badges: ["heart", "bulb"],
+      },
+      {
+        id: "history",
+        tone: "yellow",
+        heading: "PROFILE & HISTORY",
+        rows: [
+          [{ text: "PROFILE" }, { text: "&", tinted: true }, { image: stripStoryTile, size: "fill" }],
+          [{ image: stripStoryWide, size: "fill" }, { text: "HISTORY", tinted: true }],
+        ],
+        text: [
+          "父はシステムエンジニア、母はデザイナー。",
+          "ものづくりに触れて育ち、留学と開発会社での経験を経て、",
+          "いまはフリーランスのエンジニアとして活動しています。",
+        ],
+        href: "/home",
+        badges: ["palette", "sprout"],
+      },
+      {
+        id: "skills",
+        tone: "orange",
+        heading: "SYSTEM, APP & AI",
+        rows: [
+          [{ text: "SYSTEM" }, { image: stripSkillWide, size: "fill" }],
+          [{ text: "APP & AI" }, { image: stripSkillTile, size: "fill" }],
+        ],
+        text: [
+          "Webサイト、ECサイト、業務システムから、",
+          "Web・モバイルアプリ、そしてAI開発まで。",
+          `${totalIndustries}の業種で、${totalProjects}件のプロジェクトに携わってきました。`,
+        ],
+        href: "/#project-records",
+        badges: ["gear", "code"],
+      },
+      {
+        id: "voices",
+        tone: "blue",
+        heading: "VOICES",
+        rows: [
+          [{ text: "VOICE" }, { text: "S", tinted: true }, { image: stripVoiceTile, size: "fill" }],
+          [{ image: stripVoiceWide, size: "fill" }],
+        ],
+        text: [
+          "納期を守ること。ご要望の背景まで確かめること。",
+          "そして、公開したあとも、長く一緒に歩んでいくこと。",
+          "お客様からいただいた声を、ご紹介しています。",
+        ],
+        href: "/#client-reviews",
+        badges: ["bubble", "megaphone"],
+      },
+    ] satisfies DesignCard[],
+  },
+
+  /**
+   * 仕事の進め方。写真の壁が、左右を奥行きのある二列ずつで流れていきます。
+   *
+   * 写真は、仮の絵です。src/images/design/scenes/ の同じ名前のファイルを上書きすれば、
+   * そのまま差し替わります（枠は 5:6 の縦長で、比率の違う写真は切り抜いて表示します）。
+   */
+  work: {
+    label: "WORK STYLE",
+    statement: [
+      "ご相談から、設計、開発、公開、そして運用まで。",
+      "技術を提供するだけでなく、信頼され、相談され、",
+      "長く一緒に歩んでいけるエンジニアでありたい。",
+    ],
+    /**
+     * 大きな見出し。一行目は太い字、二行目は細い斜体、三行目は太い字と、
+     * 明朝の斜体を並べます。最後の script は、手書きで書かれていく一語です
+     * （線の絵は WorkWall.tsx の SCRIPT にあり、いまは「Love.」だけです）。
+     */
+    title: { first: "BUILD", second: "YOUR IDEA", third: "WITH", accent: "So Much", script: "Love." },
+    button: { label: "MORE DETAILS", href: "#design-concept" },
+    /** 手前の列（左、右）。上から順に流れてきます。 */
+    near: [
+      [sceneHearing, sceneDesign, sceneMobile, sceneTest, sceneSupport],
+      [sceneSketch, sceneCode, sceneAi, sceneLaunch, sceneTrust],
+    ],
+    /** 奥の列（左、右）。暗く、ゆっくり流れます。 */
+    far: [
+      [sceneDashboard, imgRetail, imgEducation, imgEnergy],
+      [sceneCloud, imgHealthcare, imgLogistics, imgMedia],
+    ],
+  },
+
+  /** 開発実績の紹介。大きな見出しが左右から寄ってきて、途中で、地の色が明るく切り替わります。 */
+  records: {
+    /** 見出しは二行です。一行目は右から、二行目は左から寄ってきます。 */
+    title: ["PROJECT", "RECORDS"],
+    /** 読み上げに使う見出し。 */
+    heading: "開発実績",
+    items: [record("08", imgRetail), record("14", imgHealthcare), record("53", imgResearch)],
+    /** 分野の札に出す文言。 */
+    tags: { system: "SYSTEM", app: "APP", ai: "AI" } satisfies Record<Discipline, string>,
+    hover: "VIEW MORE",
+    button: { label: "MORE DETAILS", href: "/#project-records" },
+  },
+
+  /**
+   * ご相談の入口。
+   * links の行き先は、いまは各サービスのトップページです。公開前に、ご自身の
+   * プロフィールページの URL へ書き換えてください。
+   */
+  contact: {
+    title: "CONTACT",
+    /** 背景に大きく並べる語。 */
+    words: ["BELOVED", "ENGINEER", "FOR YOU"],
+    lead: "まだアイデアの段階でも、小さなご相談でも構いません。",
+    links: [
+      { label: "CROWDWORKS", href: "https://crowdworks.jp/" },
+      { label: "LANCERS", href: "https://www.lancers.jp/" },
+    ],
+  },
+
+  /** ページのいちばん下の案内。 */
+  footer: {
+    columns: [
+      {
+        title: "PAGES",
+        links: [
+          { label: "Portfolio", href: "/" },
+          { label: "Story", href: "/home" },
+          { label: "Design", href: "#main" },
+        ],
+      },
+      {
+        title: "ABOUT",
+        links: [
+          { label: "Concept", href: "#design-concept" },
+          { label: "Industries", href: "#design-industries" },
+          { label: "Profile", href: "#design-profile" },
+          { label: "Work Style", href: "#design-work" },
+        ],
+      },
+      {
+        title: "WORKS",
+        links: [
+          { label: "Project Records", href: "/#project-records" },
+          { label: "Client Reviews", href: "/#client-reviews" },
+        ],
+      },
+      {
+        title: "CONTACT",
+        links: [
+          { label: "CrowdWorks", href: "https://crowdworks.jp/" },
+          { label: "Lancers", href: "https://www.lancers.jp/" },
+        ],
+      },
+    ],
+    /** 横に流れる、湾曲した写真の帯。 */
+    strip: [
+      imgAgriculture,
+      imgManufacturing,
+      imgRetail,
+      imgHealthcare,
+      imgCare,
+      imgGovernment,
+      imgEducation,
+      imgFinance,
+      imgLogistics,
+      imgProperty,
+      imgEnergy,
+      imgOperations,
+      imgMedia,
+      imgSecurity,
+      imgResearch,
+    ],
+    touch: "FIND ME ON…",
+    backToTop: "Back to top",
   },
 } as const;

@@ -1,0 +1,272 @@
+/* =========================================================================
+   仕事の進め方（/design）
+   左右の写真の壁が、奥行きを持って上へ流れ、最後の一語が手書きで書かれます。
+   ========================================================================= */
+
+.work {
+  /* 壁の単位。横長の画面では画面の幅の 1/100。WorkWall.tsx の unitOf と同じ式です。 */
+  --wu: calc(max(100vw, min(110svh, 220vw)) / 100);
+  /* 手書きの線と、ボタンの色。 */
+  --love: #ff5c7a;
+
+  position: relative;
+  color: #ffffff;
+  background: var(--night);
+}
+
+/* 写真の壁 -------------------------------------------------------------------
+   区画ぜんたいに重ねた通り道の中で、画面ひとつ分の舞台を、画面に固定します。
+   列の位置は WorkWall.tsx が transform に書きこみます。 */
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  overflow: clip;
+}
+
+.wall {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  perspective: calc(var(--wu) * 37.4);
+  perspective-origin: 50% 50%;
+}
+
+.column {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: var(--w);
+  margin-left: calc(var(--w) / -2);
+  gap: var(--gap);
+  transform-origin: 50% 0;
+  will-change: transform;
+}
+
+/* 手前の列：外側の端が、こちらへ迫り出すように傾けます。 */
+.near {
+  --w: calc(var(--wu) * 14.6);
+  --h: calc(var(--wu) * 17.5);
+  --gap: calc(var(--wu) * 4.84);
+
+  z-index: 2;
+  transform: translate3d(calc(var(--wu) * 22.2 * var(--side)), calc(var(--wu) * -34), 0)
+    rotateY(calc(var(--side) * -38.5deg));
+}
+
+/* 奥の列：正面を向いた、暗い壁です。 */
+.far {
+  --w: calc(var(--wu) * 13);
+  --h: calc(var(--wu) * 15.6);
+  --gap: calc(var(--wu) * 3.1);
+
+  z-index: 1;
+  opacity: 0.42;
+  transform: translate3d(calc(var(--wu) * 16.1 * var(--side)), calc(var(--wu) * -24), 0);
+}
+
+.photo {
+  position: relative;
+  display: block;
+  height: var(--h);
+  overflow: hidden;
+  background: #2a292c;
+}
+
+.photo img {
+  object-fit: cover;
+}
+
+/* 文字 ---------------------------------------------------------------------- */
+
+.content {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  padding: 17.2vw var(--gutter) 21.5vw;
+  text-align: center;
+}
+
+.intro {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+}
+
+.label {
+  font-family:
+    var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(0.75rem, 0.5rem + 0.44vw, 1.125rem);
+  font-weight: 500;
+  font-variation-settings: "wdth" 125;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.rule {
+  display: block;
+  width: calc(100vw - 5.5vw);
+  max-width: none;
+  height: 1px;
+  margin-block: 3.2vw 4.3vw;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.statement {
+  font-size: clamp(0.9375rem, 0.5rem + 0.94vw, 1.6875rem);
+  font-weight: 700;
+  font-feature-settings: normal;
+  letter-spacing: 0.06em;
+  line-height: 1.96;
+}
+
+.statement span {
+  display: block;
+}
+
+.title {
+  display: grid;
+  justify-items: center;
+  margin-top: 7.7vw;
+  font-family:
+    var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.5rem, 6.05vw, 7.5rem);
+  font-feature-settings: normal;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+  white-space: nowrap;
+}
+
+.heavy {
+  font-weight: 800;
+  font-variation-settings: "wdth" 125;
+}
+
+/* 細い斜体。同梱の書体に斜体はないので、傾けて表します。 */
+.light {
+  display: block;
+  font-weight: 300;
+  font-variation-settings: "wdth" 125;
+  transform: skewX(-12deg);
+}
+
+.last {
+  display: block;
+}
+
+.serif {
+  font-family: var(--font-serif), "Times New Roman", Georgia, serif;
+  font-size: 1.22em;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 0.78;
+}
+
+/* 手書きの一語。三行目に、少し重ねて置きます。 */
+.scriptBox {
+  width: clamp(240px, 30vw, 600px);
+  margin-top: -1.8vw;
+  transform: translateX(1.5vw);
+}
+
+.script {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  transform: skewX(-9deg);
+}
+
+.pen {
+  fill: none;
+  stroke: var(--love);
+  stroke-width: 13;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.dot {
+  fill: var(--love);
+}
+
+.spark {
+  fill: #ffffff;
+  stroke: var(--love);
+  stroke-width: 12;
+  stroke-linejoin: round;
+}
+
+.dot,
+.spark {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* ボタン（MoreButton.tsx）。手書きの線と、同じ色にします。 */
+.content .more {
+  --tone: var(--love);
+
+  margin-top: 0.9vw;
+}
+
+.content .more:focus-visible {
+  outline-color: #ffffff;
+}
+
+/* スクロールで動かす状態 ------------------------------------------------------
+   WorkWall.tsx が data-live を付けます。壁は、はじめは隠しておきます。 */
+
+.work[data-live] .wall {
+  opacity: 0;
+}
+
+.work[data-live] .content {
+  will-change: transform;
+}
+
+/* 画面幅への対応 --------------------------------------------------------- */
+
+@media (max-width: 760px) {
+  /* 写真の壁が流れていく場所を、文字のあとに取っておきます。 */
+  .content {
+    padding-block: 26vw 62svh;
+  }
+
+  .rule {
+    width: 100%;
+    margin-block: 5vw 9vw;
+  }
+
+  .statement {
+    letter-spacing: 0.02em;
+  }
+
+  .title {
+    margin-top: 20vw;
+    font-size: 11.6vw;
+  }
+
+  .scriptBox {
+    width: 62vw;
+    margin-top: -3.6vw;
+  }
+
+  .content .more {
+    margin-top: 7vw;
+  }
+
+  /* 文字が写真に重なるので、壁を暗くして、読みやすさを保ちます。 */
+  .near {
+    opacity: 0.6;
+  }
+
+  .far {
+    opacity: 0.26;
+  }
+}

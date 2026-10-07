@@ -24,6 +24,8 @@ type Props = {
   light: string;
   /** 読み上げに使う、ふつうの綴り。 */
   label: string;
+  /** 黒い地に、白い字で組みます（ページのいちばん下で使います）。 */
+  dark?: boolean;
 };
 
 /**
@@ -31,7 +33,7 @@ type Props = {
  * 止まっていても流れ続け、スクロールすると、そのぶんだけ余分に流れます。
  * 「視差効果を減らす」設定の方には、止めたままお見せします。
  */
-export function LoveFlow({ heavy, light, label }: Props) {
+export function LoveFlow({ heavy, light, label, dark = false }: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -95,7 +97,11 @@ export function LoveFlow({ heavy, light, label }: Props) {
   const parts = heavy.split("❤");
 
   return (
-    <div ref={ref} className={styles.flow} style={{ "--copies": COPIES } as CSSProperties}>
+    <div
+      ref={ref}
+      className={dark ? `${styles.flow} ${styles.dark}` : styles.flow}
+      style={{ "--copies": COPIES } as CSSProperties}
+    >
       <p className="u-sr-only">{label}</p>
       <div className={styles.shift} data-shift="" aria-hidden="true">
         <div className={styles.track}>
