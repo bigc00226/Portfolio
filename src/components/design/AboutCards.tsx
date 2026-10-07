@@ -19,7 +19,7 @@ import { Icon } from "./writingArt";
  * 中央からの横のずれは、画面の幅 × REACH × 残り² です（はじめは速く、着く手前でゆるやかに）。
  */
 const ENTER = 0.92;
-const REACH = 1.04;
+const REACH = 1;
 
 /**
  * 見出しの字は、入ってきながら、一文字ずつ縦に回って現れます。

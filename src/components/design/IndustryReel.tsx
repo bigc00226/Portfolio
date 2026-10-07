@@ -33,7 +33,7 @@ const SPRING = 150;
 const TICK = 14;
 
 /** 最後の画像が中央を過ぎたあと、業種名などを消していく範囲（基準の長さに対する割合）。 */
-const FADE: readonly [number, number] = [-0.03, -0.15];
+const FADE: readonly [number, number] = [-0.02, -0.1];
 
 /** ポインターを載せた画像の業種名を染める色。画像の順に、くり返して使います。 */
 const TONES = ["#ff4f9a", "#ff6a2b", "#ffd23f", "#3ddc97", "#4cc9f0", "#a493ff"];
@@ -245,10 +245,14 @@ export function IndustryReel({ heading, items }: Props) {
       if (next !== moved) dirty = true;
       moved = next;
 
-      /* 画面の近くにないあいだは描かず、戻ってきたときに描き直します。 */
-      if (dirty && near) dirty = draw(moved, elapsed);
+      /*
+       * 舞台が画面に掛かっていないあいだは描かず、戻ってきたときに描き直します。
+       * 画面の近くに来た時点（near）で読みこみは始めますが、描くのは、見えてからです。
+       */
+      const seen = near && moved > -height * 1.05 && moved < pin + height * 1.05;
+      if (dirty && seen) dirty = draw(moved, elapsed);
 
-      frame = moved === target && !(dirty && near) ? 0 : requestAnimationFrame(tick);
+      frame = moved === target && !(dirty && seen) ? 0 : requestAnimationFrame(tick);
     };
 
     const request = () => {
