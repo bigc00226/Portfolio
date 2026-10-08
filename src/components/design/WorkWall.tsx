@@ -14,20 +14,34 @@ import styles from "./WorkWall.module.css";
  * 写真の壁の形。長さは「壁の単位」（画面の幅の 1/100。縦長の画面では、高さから決めます）で
  * 書いています。数字は、参考にした画面の、写真の四隅と動きを測って合わせたものです。
  *
- * 手前の列は、外側の端がこちらへ迫り出すように傾いた壁で、スクロールの SPEED 倍の速さで
- * 上へ流れます。奥の列は、正面を向いた暗い壁で、ゆっくり流れます。
+ * 壁はどれも、外側の端がこちらへ迫り出すように傾いています。手前の列は明るく、スクロールの
+ * speed 倍の速さで上へ流れます。奥の列は暗く、ゆっくり流れます。
  */
+
+/**
+ * 壁の傾き（度）。奥の列も、手前の列と平行です。参考の画面では、手前と奥のどの写真も、
+ * 上下の端が、同じ一点（左の列は画面の右の端の近く、右の列は左の端の近く）へ向かって
+ * 集まっていました。
+ */
+const TILT = 38.5;
+
 const NEAR = {
   /** 列の中心の、画面の中央からの距離。 */
   center: 22.2,
-  /** 壁の傾き（度）。 */
-  tilt: 38.5,
+  tilt: TILT,
   /** 区画の上端が画面の上端に着いたときの、最初の写真の上端（画面の中央から下へ）。 */
   start: 13.7,
   /** スクロール 1 に対して、壁が上へ流れる量。 */
   speed: 2.18,
 };
-const FAR = { center: 16.1, start: 10.8, speed: 1.2 };
+
+/**
+ * 奥の列。参考の画面では、写真の内側の端が画面の中央から 8.8、外側の端が 22.8 の
+ * ところに見えます（画面の幅が 100 のとき）。傾けたうえで、そこに収まる位置と幅です。
+ * 流れる速さと、写真の位置は、参考の画面の写真の上下の端（列の中ほど）に合わせてあります。
+ * 画面の上では、列の中ほどで、スクロールの 1.18 倍の速さで流れます。
+ */
+const FAR = { center: 15.03, tilt: TILT, start: 11.36, speed: 1.254 };
 
 /** 壁が現れる範囲。区画の上端が画面の上端を過ぎてからの、スクロール量です。 */
 const APPEAR: readonly [number, number] = [1, 9];
@@ -159,10 +173,7 @@ export function WorkWall({ id, label, statement, title, button, near, far }: Pro
             const mark = `${x.toFixed(1)},${y.toFixed(1)}`;
             if (mark === column.shown) continue;
             column.shown = mark;
-            column.el.style.transform =
-              rule === NEAR
-                ? `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotateY(${-side * NEAR.tilt}deg)`
-                : `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+            column.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotateY(${-side * rule.tilt}deg)`;
           }
         }
 

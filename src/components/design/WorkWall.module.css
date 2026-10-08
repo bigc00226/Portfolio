@@ -57,15 +57,16 @@
     rotateY(calc(var(--side) * -38.5deg));
 }
 
-/* 奥の列：正面を向いた、暗い壁です。 */
+/* 奥の列：手前の列と同じ向きに傾けた、暗い壁です（位置と幅は WorkWall.tsx の FAR を参照）。 */
 .far {
-  --w: calc(var(--wu) * 13);
-  --h: calc(var(--wu) * 15.6);
-  --gap: calc(var(--wu) * 3.1);
+  --w: calc(var(--wu) * 13.4);
+  --h: calc(var(--wu) * 16.32);
+  --gap: calc(var(--wu) * 3.79);
 
   z-index: 1;
   opacity: 0.42;
-  transform: translate3d(calc(var(--wu) * 16.1 * var(--side)), calc(var(--wu) * -24), 0);
+  transform: translate3d(calc(var(--wu) * 15.03 * var(--side)), calc(var(--wu) * -26.7), 0)
+    rotateY(calc(var(--side) * -38.5deg));
 }
 
 .photo {
