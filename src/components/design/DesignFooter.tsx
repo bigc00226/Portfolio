@@ -26,6 +26,9 @@ function Anchor({ link, className }: { link: LinkItem; className?: string }) {
     return (
       <a className={className} href={link.href} target="_blank" rel="noopener noreferrer">
         {link.label}
+        <span className="u-sr-only" lang="ja">
+          （新しいタブで開きます）
+        </span>
       </a>
     );
   }
@@ -62,9 +65,9 @@ export function DesignFooter({ name, logo, columns, strip, touch, socials, backT
             </p>
           </div>
 
-          <nav className={styles.nav} aria-label="ページの案内" lang="en">
+          <nav className={styles.nav} aria-label="ページの案内">
             {columns.map((column) => (
-              <div key={column.title} className={styles.column}>
+              <div key={column.title} className={styles.column} lang="en">
                 <p className={styles.heading}>{column.title}</p>
                 <ul className={styles.list}>
                   {column.links.map((link) => (

@@ -356,9 +356,17 @@ ABOUT の見出しとカードは `profile` です。`cards` の一枚ぶんは�
   描き直してください。
 - `records.items` は、`record("08", 画像)` のように、開発実績（`projects.ts`）の番号で
   選びます。題名・業種・分野の札は、そこから自動で入ります。
-- **`contact.links` と、`footer` の CONTACT の行き先は、いまは CrowdWorks と
-  Lancers のトップページです。公開前に、ご自身のプロフィールページの URL へ
-  書き換えてください。**
+- ご相談の入口の二つのボタンと、いちばん下の案内（CONTACT と FIND ME ON…）の
+  CrowdWorks・Lancers は、どれもプロフィールのページへ、新しいタブで移ります。
+  行き先は `design.ts` の先頭近くの `platforms` に一か所でまとめてあるので、URL を
+  変えるときは、そこの `href` を書き換えてください。
+- ボタンに付けたロゴは、`src/images/brands/` の公式のアイコンです。それぞれの
+  サービスが自分のサイトで使っているものを、色も形も変えずに使っています。
+  `crowdworks.svg` は crowdworks.jp のアイコン（`favicon.svg`）、`lancers.svg` は
+  www.lancers.jp がアプリの案内に使っているアイコンです。ランサーズのアイコンは
+  絵が四角なので、ランサーズ自身の表示に合わせて、角を丸めて表示しています
+  （`platforms` の `logoCorner`）。各サービスがロゴを新しくしたときは、同じ名前で
+  上書きしてください。
 
 ### 動きを調整する
 
@@ -480,6 +488,7 @@ src/
   images/design/      デザインページの帯に並べる写真（いまは仮の画像）。
                       industries/ に業種の画像、scenes/ に写真の壁の絵、
                       strips/ にカードの見出しの絵（どれも仮の絵）
+  images/brands/      CrowdWorks と Lancers の公式のアイコン（ご相談のボタン用）
   lib/                サーバー側の補助処理
 public/media/         バナーの動画とポスター画像
 ```

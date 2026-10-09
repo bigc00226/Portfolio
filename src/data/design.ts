@@ -1,5 +1,7 @@
 import type { StaticImageData } from "next/image";
 
+import logoCrowdworks from "@/images/brands/crowdworks.svg";
+import logoLancers from "@/images/brands/lancers.svg";
 import frame01 from "@/images/design/01.jpg";
 import frame02 from "@/images/design/02.jpg";
 import frame03 from "@/images/design/03.jpg";
@@ -141,6 +143,34 @@ export type ConceptLine =
       /** 黄色いマーカーの下線を引きます。 */
       marker?: boolean;
     };
+
+/**
+ * お仕事を受けている、外部のサービスのプロフィール。ご相談の入口のボタンと、
+ * いちばん下の案内（CONTACT と FIND ME ON…）は、どちらもここへ移ります。
+ *
+ * logo は、それぞれのサービスが自分のサイトで使っている、公式のアイコンです
+ * （src/images/brands/）。色も形も、手を加えずにそのまま使っています。
+ * - crowdworks.svg … crowdworks.jp のアイコン（https://crowdworks.jp/favicon.svg）。
+ *   角の丸い白い地が、絵に含まれています。
+ * - lancers.svg … www.lancers.jp がアプリの案内に使っているアイコン
+ *   （https://static.lancers.jp/renewal/img/common/header/logo_app_lancers.svg）。
+ *   絵は四角なので、ランサーズ自身の表示（34px に対して角の丸み 8px）に合わせて、
+ *   logoCorner で角を丸めて表示します。
+ */
+const platforms = {
+  crowdworks: {
+    name: "CrowdWorks",
+    href: "https://crowdworks.jp/public/employees/7102715",
+    logo: logoCrowdworks,
+    logoCorner: undefined,
+  },
+  lancers: {
+    name: "Lancers",
+    href: "https://www.lancers.jp/profile/funa_10Apple",
+    logo: logoLancers,
+    logoCorner: "23.5%",
+  },
+} as const;
 
 /** 開発実績（projects.ts）から、番号で一件を選びます。画像は、その業種のものを使います。 */
 function record(id: string, image: StaticImageData): DesignRecord {
@@ -450,9 +480,8 @@ export const design = {
   },
 
   /**
-   * ご相談の入口。
-   * links の行き先は、いまは各サービスのトップページです。公開前に、ご自身の
-   * プロフィールページの URL へ書き換えてください。
+   * ご相談の入口。ボタンを押すと、それぞれのサービスのプロフィールが、新しいタブで開きます。
+   * 行き先は、上の platforms にまとめてあります。
    */
   contact: {
     title: "CONTACT",
@@ -460,8 +489,8 @@ export const design = {
     words: ["BELOVED", "ENGINEER", "FOR YOU"],
     lead: "まだアイデアの段階でも、小さなご相談でも構いません。",
     links: [
-      { label: "CROWDWORKS", href: "https://crowdworks.jp/" },
-      { label: "LANCERS", href: "https://www.lancers.jp/" },
+      { label: "CROWDWORKS", ...platforms.crowdworks },
+      { label: "LANCERS", ...platforms.lancers },
     ],
   },
 
@@ -495,8 +524,8 @@ export const design = {
       {
         title: "CONTACT",
         links: [
-          { label: "CrowdWorks", href: "https://crowdworks.jp/" },
-          { label: "Lancers", href: "https://www.lancers.jp/" },
+          { label: platforms.crowdworks.name, href: platforms.crowdworks.href },
+          { label: platforms.lancers.name, href: platforms.lancers.href },
         ],
       },
     ],

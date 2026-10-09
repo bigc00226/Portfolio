@@ -1,3 +1,5 @@
+import Image, { type StaticImageData } from "next/image";
+
 import { HEART_BOX, HEART_PATH } from "./handwriting";
 import styles from "./Contact.module.css";
 
@@ -7,7 +9,16 @@ type Props = {
   /** 背景に大きく並べる語。 */
   words: readonly string[];
   lead: string;
-  links: readonly { label: string; href: string }[];
+  /**
+   * 行き先のボタン。logo は、そのサービスのロゴです。logoCorner は、ロゴの絵に
+   * 角の丸みがないときに、表示で付ける角の丸み（CSS の border-radius）です。
+   */
+  links: readonly {
+    label: string;
+    href: string;
+    logo: StaticImageData;
+    logoCorner?: string;
+  }[];
 };
 
 /**
@@ -41,9 +52,24 @@ export function Contact({ id, title, words, lead, links }: Props) {
         <ul className={styles.links}>
           {links.map((link) => (
             <li key={link.href}>
-              <a className={styles.pill} href={link.href} target="_blank" rel="noopener noreferrer" lang="en">
-                {link.label}
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <a className={styles.pill} href={link.href} target="_blank" rel="noopener noreferrer">
+                {/* ロゴは飾りとして扱います。サービスの名前は、すぐ隣の文字で読み上げられます。 */}
+                <span className={styles.logo}>
+                  {/*
+                   * 大きさは CSS で字の高さに合わせます。ここで渡す 48 は、HTML に書く目安の
+                   * 大きさです（渡さないと、絵の大きさ。ランサーズの絵は 1537 になります）。
+                   */}
+                  <Image
+                    src={link.logo}
+                    alt=""
+                    width={48}
+                    height={48}
+                    style={link.logoCorner ? { borderRadius: link.logoCorner } : undefined}
+                  />
+                </span>
+                <span lang="en">{link.label}</span>
+                <span className="u-sr-only">のプロフィール（新しいタブで開きます）</span>
+                <svg className={styles.arrow} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                   <path d="M4 12h15M13 6l6 6-6 6" />
                 </svg>
               </a>

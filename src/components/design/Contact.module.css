@@ -87,7 +87,8 @@
   align-items: center;
   gap: 0.36em;
   height: 1.78em;
-  padding-inline: 1em 0.9em;
+  /* 左は、ロゴの札のぶん、詰めておきます。 */
+  padding-inline: 0.3em 0.9em;
   border: 1.5px solid #ffffff;
   border-radius: var(--radius-pill);
   font-family:
@@ -105,7 +106,27 @@
     background 0.35s var(--ease-soft);
 }
 
-.pill svg {
+/*
+ * サービスのロゴ（それぞれのサービスのアイコン）。どちらのロゴにも、色の付いた地が
+ * 元から付いているので、黒いボタンの上でも、そのまま見えます。絵には手を加えず、
+ * 字の高さに合わせて置くだけです（角の丸みは、design.ts の logoCorner）。
+ */
+.logo {
+  display: block;
+  flex: none;
+  width: 1.18em;
+  height: 1.18em;
+  margin-right: 0.12em;
+}
+
+.logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.arrow {
+  flex: none;
   width: 0.9em;
   height: 0.9em;
   fill: none;
@@ -121,8 +142,16 @@
   background: #ffffff;
 }
 
-.pill:hover svg {
+.pill:hover .arrow {
   transform: translateX(0.18em);
+}
+
+/*
+ * ボタンが白に変わると、白い地のアイコン（CrowdWorks）の輪郭が見えなくなるので、
+ * 絵の形に沿って、ごく薄い影で縁取ります。絵そのものには手を加えません。
+ */
+.pill:hover .logo img {
+  filter: drop-shadow(0 0 0.5px rgb(0 0 0 / 0.55)) drop-shadow(0 0 0.5px rgb(0 0 0 / 0.35));
 }
 
 .pill:focus-visible {
@@ -147,7 +176,8 @@
     align-items: center;
   }
 
+  /* ロゴのぶん幅が広がったので、長いほう（CROWDWORKS）が画面に収まる大きさにします。 */
   .pill {
-    font-size: 7vw;
+    font-size: 6.2vw;
   }
 }
