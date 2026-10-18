@@ -46,7 +46,7 @@ export const site = {
 
   header: {
     /** 「54件」の後ろに付く語。 */
-    projectsLabel: "件の開発実績",
+    projectsLabel: "件の主な実績",
   },
 
   footer: {

@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Texture } from "@/components/Texture";
 import { site } from "@/data/site";
 
+import { sharedOpenGraph, sharedTwitter } from "./shared-metadata";
 import "./globals.css";
 
 const display = localFont({
@@ -61,14 +62,12 @@ export const metadata: Metadata = {
   description: site.description,
   applicationName: site.name,
   openGraph: {
+    ...sharedOpenGraph,
     title: site.title,
     description: site.description,
-    siteName: site.name,
-    type: "website",
-    locale: "ja_JP",
   },
   twitter: {
-    card: "summary_large_image",
+    ...sharedTwitter,
     title: site.title,
     description: site.description,
   },
