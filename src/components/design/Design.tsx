@@ -9,7 +9,6 @@ import logo from "@/images/logo.png";
 import { About } from "./About";
 import { AboutCards } from "./AboutCards";
 import { ConceptTitle } from "./ConceptTitle";
-import { Contact } from "./Contact";
 import styles from "./Design.module.css";
 import { DesignFooter } from "./DesignFooter";
 import { DesignHero } from "./DesignHero";
@@ -21,8 +20,7 @@ import { SmoothWheel } from "./SmoothWheel";
 import { WorkWall } from "./WorkWall";
 import { Writing } from "./Writing";
 
-const { about, concept, contact, flow, footer, frames, hero, industries, profile, records, work } =
-  design;
+const { about, concept, flow, footer, frames, hero, industries, profile, records, work } = design;
 
 /** 「仕事の進め方」の見出しで、一部の語に使う、明朝の斜体。このページでだけ読みこみます。 */
 const serif = Instrument_Serif({
@@ -51,8 +49,8 @@ function textureUrl(src: string, width: number, ratio = 16 / 9) {
 
 /**
  * /design の本体。最初の画面、書かれていく文章、流れる大きな文字、暗い幕の上の紹介文、
- * 業種のギャラリー、ABOUT のカード、仕事の進め方、開発実績、ご相談の入口、
- * いちばん下の案内を、この順に並べます。
+ * 業種のギャラリー、ABOUT のカード、仕事の進め方、開発実績、いちばん下の案内を、
+ * この順に並べます。
  */
 export function Design() {
   return (
@@ -140,21 +138,12 @@ export function Design() {
 
       {/* ここから下は、黒い地です。 */}
       <div className={styles.tail}>
-        <Contact
-          id="design-contact"
-          title={contact.title}
-          words={contact.words}
-          lead={contact.lead}
-          links={contact.links}
-        />
         <LoveFlow heavy={flow.heavy} light={flow.light} label={flow.label} dark />
         <DesignFooter
           name={site.name}
           logo={logo}
           columns={footer.columns}
           strip={footer.strip}
-          touch={footer.touch}
-          socials={contact.links.map((link) => ({ label: link.label, href: link.href }))}
           backToTop={footer.backToTop}
         />
       </div>

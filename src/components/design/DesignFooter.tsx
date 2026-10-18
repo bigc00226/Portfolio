@@ -12,9 +12,6 @@ type Props = {
   columns: readonly { title: string; links: readonly LinkItem[] }[];
   /** 横に流れる、湾曲した写真の帯。 */
   strip: readonly StaticImageData[];
-  /** 外部サービスへの案内。 */
-  touch: string;
-  socials: readonly LinkItem[];
   backToTop: string;
 };
 
@@ -51,7 +48,7 @@ function Anchor({ link, className }: { link: LinkItem; className?: string }) {
  * 写真の帯は、手前にふくらんだ形に切り抜いてあり、ゆっくり左へ流れます
  * （「視差効果を減らす」設定の方には、止めたままお見せします）。
  */
-export function DesignFooter({ name, logo, columns, strip, touch, socials, backToTop }: Props) {
+export function DesignFooter({ name, logo, columns, strip, backToTop }: Props) {
   return (
     <footer className={styles.footer}>
       <div className={styles.panel}>
@@ -99,17 +96,6 @@ export function DesignFooter({ name, logo, columns, strip, touch, socials, backT
               </div>
             ))}
           </div>
-        </div>
-
-        <div className={styles.touch} lang="en">
-          <p className={styles.touchLabel}>{touch}</p>
-          <ul className={styles.socials}>
-            {socials.map((link) => (
-              <li key={link.href}>
-                <Anchor link={link} className={styles.link} />
-              </li>
-            ))}
-          </ul>
         </div>
 
         <div className={styles.base} lang="en">

@@ -59,7 +59,7 @@
 
 .nav {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(20px, 2.4vw, 48px);
 }
 
@@ -152,38 +152,16 @@
   }
 }
 
-.touch {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 10px clamp(18px, 2.2vw, 44px);
-  margin-top: 4vw;
-  padding-bottom: clamp(16px, 1.6vw, 30px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.82);
-}
-
-.touchLabel {
-  font-size: clamp(0.9375rem, 0.5rem + 0.9vw, 1.6875rem);
-  font-weight: 800;
-  font-variation-settings: "wdth" 125;
-  line-height: 1.1;
-}
-
-.socials {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px clamp(18px, 2.2vw, 44px);
-  padding: 0;
-  list-style: none;
-}
-
+/* いちばん下の行（著作権の表示と、ページ上部へ戻るリンク）。写真の帯との間を、細い線で区切ります。 */
 .base {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
   gap: 8px 24px;
+  margin-top: 4vw;
   padding-top: clamp(12px, 1.2vw, 24px);
+  border-top: 1px solid rgba(255, 255, 255, 0.82);
   font-size: clamp(0.75rem, 0.5rem + 0.42vw, 1.0625rem);
   font-weight: 400;
   line-height: 1.4;
@@ -228,7 +206,7 @@
     margin-top: 40px;
   }
 
-  .touch {
+  .base {
     margin-top: 32px;
   }
 }
