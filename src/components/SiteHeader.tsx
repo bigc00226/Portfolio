@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 import { site } from "@/data/site";
-import { totalIndustries, totalProjects } from "@/data/projects";
+import { totalProjects } from "@/data/projects";
 import logo from "@/images/logo.png";
 
 import styles from "./SiteHeader.module.css";
@@ -21,11 +21,6 @@ export function SiteHeader() {
           <span>
             {totalProjects}
             {site.header.projectsLabel}
-          </span>
-          <span className={styles.dot} aria-hidden="true" />
-          <span>
-            {totalIndustries}
-            {site.header.industriesLabel}
           </span>
         </p>
       </div>

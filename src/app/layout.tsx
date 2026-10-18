@@ -85,7 +85,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   /*
    * data-scroll-behavior は、ページを移るときだけ、なめらかなスクロールを
-   * 止めるための指定です。/ と /home を行き来するたびに長い距離を流れて
+   * 止めるための指定です。/・/works・/home を行き来するたびに長い距離を流れて
    * しまわないようにしています。ページ内のリンクは、これまでどおり動きます。
    */
   return (

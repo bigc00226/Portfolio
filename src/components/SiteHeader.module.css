@@ -11,7 +11,7 @@
 }
 
 /*
- * /design では、最初の画面（舞台）が見えているあいだ、ヘッダーも画面に残します。
+ * デザインページ（/）では、最初の画面（舞台）が見えているあいだ、ヘッダーも画面に残します。
  * 舞台が流れきったら、上へ引っこめます。切り替えているのは DesignHero.tsx です。
  */
 :global(html[data-design-hero]) .header {
@@ -84,15 +84,7 @@
 .meta {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
   color: var(--text-mute);
-}
-
-.dot {
-  width: 3px;
-  height: 3px;
-  background: var(--text-faint);
-  border-radius: 50%;
 }
 
 @media (max-width: 720px) {
@@ -112,13 +104,5 @@
 
   .meta {
     font-size: 0.625rem;
-    gap: 9px;
-  }
-}
-
-/* 狭い画面では、ロゴの文字を残し、右側は件数だけにします。 */
-@media (max-width: 389px) {
-  .meta > :not(:first-child) {
-    display: none;
   }
 }

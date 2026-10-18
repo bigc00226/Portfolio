@@ -620,4 +620,3 @@ export const caseCounts: Record<Discipline, number> = disciplineOrder.reduce(
 );
 
 export const totalProjects = allProjects.length;
-export const totalIndustries = industries.length;

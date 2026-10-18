@@ -1,36 +1,27 @@
-import { ProjectRecords } from "@/components/ProjectRecords";
-import { Reviews } from "@/components/Reviews";
-import { VideoBanner } from "@/components/VideoBanner";
-import { site } from "@/data/site";
-import { publicFileExists } from "@/lib/media";
+import type { Metadata } from "next";
 
-export default async function HomePage() {
-  /*
-   * 実際に置かれているファイルだけをバナーに渡します。public/media に
-   * 置けば次の描画から読み込まれ、それまでは用意した静止画面が表示され、
-   * ブラウザは何も取りにいきません。
-   */
-  const available = await Promise.all(
-    site.banner.sources.map(async (source) => ({
-      source,
-      exists: await publicFileExists(source.src),
-    })),
-  );
+import { Design } from "@/components/design/Design";
+import { design } from "@/data/design";
 
-  const sources = available
-    .filter((entry) => entry.exists)
-    .map(({ source }) => ({ src: source.src, type: source.type }));
+export const metadata: Metadata = {
+  title: design.title,
+  description: design.description,
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: design.title,
+    description: design.description,
+    url: "/",
+  },
+  twitter: {
+    title: design.title,
+    description: design.description,
+  },
+};
 
-  const hasPoster = await publicFileExists(site.banner.poster);
-
+export default function DesignPage() {
   return (
     <main id="main">
-      <VideoBanner
-        sources={sources}
-        poster={hasPoster ? site.banner.poster : undefined}
-      />
-      <ProjectRecords />
-      <Reviews />
+      <Design />
     </main>
   );
 }

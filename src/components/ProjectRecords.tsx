@@ -14,7 +14,6 @@ import {
   disciplineOrder,
   disciplineShortLabels,
   industries,
-  totalIndustries,
   totalProjects,
   type Discipline,
 } from "@/data/projects";
@@ -121,7 +120,7 @@ export function ProjectRecords() {
 
             <div className={styles.headAside}>
               <p className="lead">
-                {`${totalIndustries}の業種にわたる、${totalProjects}件の主な開発実績です。最初の要件定義のお打ち合わせから、納品後の運用・保守まで一貫して担当しています。`}
+                {`${totalProjects}件の主な開発実績です。最初の要件定義のお打ち合わせから、納品後の運用・保守まで一貫して担当しています。`}
               </p>
               <p className={`mono ${styles.headHint}`}>
                 分野または業種を選ぶと、絞り込めます

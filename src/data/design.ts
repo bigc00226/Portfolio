@@ -44,10 +44,10 @@ import stripValuesWide from "@/images/design/strips/values-wide.jpg";
 import stripVoiceTile from "@/images/design/strips/voice-tile.jpg";
 import stripVoiceWide from "@/images/design/strips/voice-wide.jpg";
 
-import { allProjects, industries, totalIndustries, totalProjects, type Discipline } from "./projects";
+import { allProjects, industries, type Discipline } from "./projects";
 
 /**
- * /design のページに出てくる文言と画像をまとめています。
+ * デザインページ（トップページ /）に出てくる文言と画像をまとめています。
  *
  * 帯に並ぶ画像は、本番の写真が用意できるまでの仮のものです。
  * src/images/design/ の 01.jpg〜08.jpg を同じ名前で上書きすれば、
@@ -258,7 +258,7 @@ export const design = {
         "これからも目指していきます。",
       ],
     ] satisfies ConceptLine[][],
-    primary: { label: "開発実績を見る", href: "/#project-records" },
+    primary: { label: "開発実績を見る", href: "/works#project-records" },
     secondary: { label: "物語を読む", href: "/home" },
   },
 
@@ -283,18 +283,28 @@ export const design = {
       [
         "Love Appleは、両親から受け継いだウェブ制作とシステム開発の知識を原点に、",
         "留学時代や開発会社で培ったシステム開発・アプリ開発・AI開発の経験を活かし、",
-        "これまで15種類の業種にわたるさまざまなプロジェクトに携わってきました。",
+        "これまでさまざまなプロジェクトに携わってきました。",
       ],
       [
         "Webサイトから業務システム、アプリ、AIまで、",
         "業種や課題に合わせて技術を組み合わせ、",
         "アイデアを具体的なカタチへと変えていきます。",
       ],
+      [
+        "制作・開発の実績は、現在300件を超えています。",
+        "その多くは秘密保持契約により公開できないため、",
+        "ここでは、ごく一部のプロジェクトのみをご紹介しています。",
+      ],
+      [
+        "こだわり抜いたデザインとともに、",
+        "システム・アプリ・AIの開発実績をお届けします。",
+        "ぜひ、ご覧ください。",
+      ],
     ],
   },
 
   /**
-   * 紹介文のあと、横に流れていく 15 の業種。並びは、トップページの開発実績と同じです。
+   * 紹介文のあと、横に流れていく業種。並びは、開発実績のページ（/works）と同じです。
    *
    * 画像は、本番の写真が用意できるまでの仮の絵です。src/images/design/industries/ の
    * 同じ名前のファイルを上書きすれば、そのまま差し替わります。枠は 13:8 です。
@@ -302,7 +312,7 @@ export const design = {
    */
   industries: {
     /** 読み上げに使う、この区画の見出し。 */
-    heading: "これまでに携わってきた15の業種",
+    heading: "これまでに携わってきた業種",
     items: [
       { id: "agriculture", lines: ["農林水産業"], caption: "AGRICULTURE, FORESTRY & FISHERIES", image: imgAgriculture },
       { id: "manufacturing", lines: ["製造業"], caption: "MANUFACTURING", image: imgManufacturing },
@@ -380,9 +390,9 @@ export const design = {
         text: [
           "Webサイト、ECサイト、業務システムから、",
           "Web・モバイルアプリ、そしてAI開発まで。",
-          `${totalIndustries}の業種で、${totalProjects}件のプロジェクトに携わってきました。`,
+          "300件を超えるプロジェクトに携わってきました。",
         ],
-        href: "/#project-records",
+        href: "/works#project-records",
         badges: ["gear", "code"],
       },
       {
@@ -398,7 +408,7 @@ export const design = {
           "そして、公開したあとも、長く一緒に歩んでいくこと。",
           "お客様からいただいた声を、ご紹介しています。",
         ],
-        href: "/#client-reviews",
+        href: "/works#client-reviews",
         badges: ["bubble", "megaphone"],
       },
     ] satisfies DesignCard[],
@@ -446,7 +456,7 @@ export const design = {
     /** 分野の札に出す文言。 */
     tags: { system: "SYSTEM", app: "APP", ai: "AI" } satisfies Record<Discipline, string>,
     hover: "VIEW MORE",
-    button: { label: "MORE DETAILS", href: "/#project-records" },
+    button: { label: "MORE DETAILS", href: "/works#project-records" },
   },
 
   /** ページのいちばん下の案内。 */
@@ -455,9 +465,9 @@ export const design = {
       {
         title: "PAGES",
         links: [
-          { label: "Portfolio", href: "/" },
+          { label: "Top", href: "#main" },
+          { label: "Works", href: "/works" },
           { label: "Story", href: "/home" },
-          { label: "Design", href: "#main" },
         ],
       },
       {
@@ -472,8 +482,8 @@ export const design = {
       {
         title: "WORKS",
         links: [
-          { label: "Project Records", href: "/#project-records" },
-          { label: "Client Reviews", href: "/#client-reviews" },
+          { label: "Project Records", href: "/works#project-records" },
+          { label: "Client Reviews", href: "/works#client-reviews" },
         ],
       },
     ],

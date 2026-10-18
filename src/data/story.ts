@@ -266,7 +266,7 @@ export const story = {
     kicker: "ご相談",
     title: ["まずは、お気軽に", "ご相談ください。"],
     lead: "「こんなサービスをつくりたい」「アイデアを形にできるか相談したい」という段階でも大歓迎です。一緒に最適な形を考え、プロジェクトの実現を全力でサポートいたします。",
-    primary: { label: "開発実績を見る", href: "/#project-records" },
-    secondary: { label: "お客様の声を見る", href: "/#client-reviews" },
+    primary: { label: "開発実績を見る", href: "/works#project-records" },
+    secondary: { label: "お客様の声を見る", href: "/works#client-reviews" },
   },
 } as const;
