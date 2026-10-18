@@ -12,7 +12,8 @@ export function SiteHeader() {
       <div className={`shell ${styles.inner}`}>
         {/*
          * どのページからでも、トップページ（/）の先頭へ戻ります。
-         * / にいるときは、読み直さずに、その場で先頭へ移ります。
+         * / にいるときは、読み直さずに、その場で先頭へ移ります。ただし、URL に
+         * 「?fbclid=…」などが付いているときは、/ を読み直します。
          */}
         <a className={styles.mark} href="/#main" aria-label={`${site.name}　トップページへ`}>
           <span className={styles.logo}>
