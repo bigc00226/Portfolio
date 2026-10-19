@@ -5,7 +5,7 @@ import { useRef, useState, type CSSProperties } from "react";
 
 import { useIsomorphicLayoutEffect } from "@/components/useInView";
 
-import styles from "./IndustryReel.module.css";
+import styles from "./ShowcaseReel.module.css";
 import type { Reel } from "./reel";
 import { HURRY, PITCH, START, SWITCH, drumOf, runOf, travelOf, unitOf } from "./reelShape";
 
@@ -29,18 +29,18 @@ const BOW_LIMIT = 0.022;
 /** たわみが勢いに追いつく、また元へ戻るまでの時間（ミリ秒）。 */
 const SPRING = 150;
 
-/** 下端の目盛りの間隔（ピクセル）。IndustryReel.module.css の .ruler と合わせます。 */
+/** 下端の目盛りの間隔（ピクセル）。ShowcaseReel.module.css の .ruler と合わせます。 */
 const TICK = 14;
 
-/** 最後の画像が中央を過ぎたあと、業種名などを消していく範囲（基準の長さに対する割合）。 */
+/** 最後の画像が中央を過ぎたあと、題名などを消していく範囲（基準の長さに対する割合）。 */
 const FADE: readonly [number, number] = [-0.02, -0.1];
 
-/** ポインターを載せた画像の業種名を染める色。画像の順に、くり返して使います。 */
+/** ポインターを載せた画像の題名を染める色。画像の順に、くり返して使います。 */
 const TONES = ["#ff4f9a", "#ff6a2b", "#ffd23f", "#3ddc97", "#4cc9f0", "#a493ff"];
 
 export type ReelItem = {
   id: string;
-  /** 大きく出す業種名。行ごとに分けてあります。 */
+  /** 大きく出す題名。行ごとに分けてあります。 */
   lines: readonly string[];
   /** 画像の下に小さく添える欧文。 */
   caption: string;
@@ -62,10 +62,10 @@ const clamp = (value: number, low: number, high: number) => Math.min(high, Math.
 const widthOf = (line: string) =>
   Array.from(line).reduce((sum, char) => sum + (char === "・" ? 0.6 : char.charCodeAt(0) < 0x2000 ? 0.66 : 1), 0);
 
-/** 業種名の字の大きさ（基準の長さに対する割合）。一行のときは、大きく出します。 */
+/** 題名の字の大きさ（基準の長さに対する割合）。一行のときは、大きく出します。 */
 const TITLE_SIZE = { single: 0.08, stacked: 0.0625 };
 
-/** 大きな業種名。切り替わるたびに作り直され、一文字ずつ、下から現れます。 */
+/** 大きな題名。切り替わるたびに作り直され、一文字ずつ、下から現れます。 */
 function Title({ lines, tone }: { lines: readonly string[]; tone: string | null }) {
   let order = 0;
 
@@ -98,14 +98,14 @@ function Title({ lines, tone }: { lines: readonly string[]; tone: string | null 
 }
 
 /**
- * これまでに携わってきた業種のギャラリー。
+ * 制作事例のギャラリー。これまでに作ったシステムの画面を、一枚ずつ流します。
  *
- * サーバーが返す HTML は、画像と業種名を並べた一覧です。JavaScript を無効にしている方、
+ * サーバーが返す HTML は、画像と題名を並べた一覧です。JavaScript を無効にしている方、
  * 「視差効果を減らす」設定の方、WebGL が使えない環境の方には、そのままお見せします。
  * それ以外の環境では、画面を固定し、スクロールに合わせて、湾曲した画像の帯を右から左へ
- * 流します。中央に来た画像に合わせて、大きな業種名が切り替わります。
+ * 流します。中央に来た画像に合わせて、大きな題名が切り替わります。
  */
-export function IndustryReel({ heading, items }: Props) {
+export function ShowcaseReel({ heading, items }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -115,7 +115,7 @@ export function IndustryReel({ heading, items }: Props) {
   const [motion, setMotion] = useState(false);
   /* WebGL が使えなかったときは、一覧のままにします。 */
   const [failed, setFailed] = useState(false);
-  /* いま大きく出している業種。hovered は、ポインターを載せた画像のものかどうか。 */
+  /* いま大きく出している画面。hovered は、ポインターを載せた画像のものかどうか。 */
   const [shown, setShown] = useState({ index: 0, hovered: false });
 
   const cinema = motion && !failed;
@@ -201,7 +201,7 @@ export function IndustryReel({ heading, items }: Props) {
 
       /*
        * 舞台が下から上がってくるあいだ、画像は、固定したあとと同じ高さに置いておきます。
-       * 業種名が上がってくるところへ、画像が横から入ってくる形になります。
+       * 題名が上がってくるところへ、画像が横から入ってくる形になります。
        */
       const lift = Math.max(0, -scrolled).toFixed(1);
       if (lift !== lifted) {
@@ -212,7 +212,7 @@ export function IndustryReel({ heading, items }: Props) {
       /* 下端の目盛りは、帯と一緒に流れます。 */
       ruler.style.transform = `translate3d(${(first % TICK).toFixed(1)}px, 0, 0)`;
 
-      /* 画像の中心が、中央の少し右を越えたら、その業種名に切り替えます。 */
+      /* 画像の中心が、中央の少し右を越えたら、その題名に切り替えます。 */
       const index = clamp(Math.floor((SWITCH * unit - first) / pitch), 0, count - 1);
       const display = hovered >= 0 ? hovered : index;
       if (display !== current || hovered >= 0 !== wasHovered) {
@@ -221,7 +221,7 @@ export function IndustryReel({ heading, items }: Props) {
         setShown({ index: display, hovered: wasHovered });
       }
 
-      /* 最後の画像が中央を過ぎたら、業種名などを消していきます。 */
+      /* 最後の画像が中央を過ぎたら、題名などを消していきます。 */
       const last = (first + (count - 1) * pitch) / unit;
       const visible = (1 - clamp((FADE[0] - last) / (FADE[0] - FADE[1]), 0, 1)).toFixed(3);
       if (visible !== opacity) {
@@ -361,9 +361,9 @@ export function IndustryReel({ heading, items }: Props) {
       className={cinema ? `${styles.reel} ${styles.cinema}` : styles.reel}
       style={{ "--travel": travelOf(items.length).toFixed(3), "--rate": RATE } as CSSProperties}
       data-reel={failed ? "off" : cinema ? "on" : undefined}
-      aria-labelledby="design-industries"
+      aria-labelledby="design-showcase"
     >
-      <h2 id="design-industries" className="u-sr-only">
+      <h2 id="design-showcase" className="u-sr-only">
         {heading}
       </h2>
 

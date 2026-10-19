@@ -39,7 +39,7 @@ export const EXIT = -1.13;
  * 画像が左へ抜けていくのと、次の見出しが入ってくるのとが、ちょうど入れ替わります。
  */
 export const HURRY = 1.22;
-/** 画像の中心がここを左へ越えたら、その業種名に切り替えます。 */
+/** 画像の中心がここを左へ越えたら、その題名に切り替えます。 */
 export const SWITCH = 0.068;
 
 /** 最後の画像が中央に来るまでに、帯が流れる長さ。 */
@@ -61,7 +61,7 @@ export const drumOf = (width: number, height: number) =>
 /**
  * 基準の長さ。ふつうは円筒の長さと同じですが、縦に余裕のある横長の画面では、
  * 画像が小さく見えないよう、2 割まで大きくします（参考にした画面の縦横比のとき、
- * ちょうど画面の幅になります）。IndustryReel.module.css の --u と同じ式です。
+ * ちょうど画面の幅になります）。ShowcaseReel.module.css の --u と同じ式です。
  */
 export const unitOf = (width: number, height: number) =>
   Math.max(drumOf(width, height), Math.min(Math.max(width, height * 2.152), width * 1.2));

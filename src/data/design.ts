@@ -35,6 +35,35 @@ import sceneSketch from "@/images/design/scenes/sketch.jpg";
 import sceneSupport from "@/images/design/scenes/support.jpg";
 import sceneTest from "@/images/design/scenes/test.jpg";
 import sceneTrust from "@/images/design/scenes/trust.jpg";
+import rentalBackup from "@/images/design/showcase/rental/backup.png";
+import rentalHistory from "@/images/design/showcase/rental/history.png";
+import rentalHome from "@/images/design/showcase/rental/home.png";
+import rentalImport from "@/images/design/showcase/rental/import.png";
+import rentalInsurers from "@/images/design/showcase/rental/insurers.png";
+import rentalInvoice from "@/images/design/showcase/rental/invoice.png";
+import rentalLogin from "@/images/design/showcase/rental/login.jpg";
+import rentalRentals from "@/images/design/showcase/rental/rentals.png";
+import rentalUsers from "@/images/design/showcase/rental/users.png";
+import rentalUtilization from "@/images/design/showcase/rental/utilization.png";
+import rentalVehicles from "@/images/design/showcase/rental/vehicles.png";
+import sanctuaryAdminReservations from "@/images/design/showcase/sanctuary/admin-reservations.jpg";
+import sanctuaryAdminSales from "@/images/design/showcase/sanctuary/admin-sales.jpg";
+import sanctuaryApply from "@/images/design/showcase/sanctuary/apply.jpg";
+import sanctuaryBeautyFilter from "@/images/design/showcase/sanctuary/beauty-filter.jpg";
+import sanctuaryBookingConfirm from "@/images/design/showcase/sanctuary/booking-confirm.jpg";
+import sanctuaryBookingConfirmed from "@/images/design/showcase/sanctuary/booking-confirmed.jpg";
+import sanctuaryBookingDatetime from "@/images/design/showcase/sanctuary/booking-datetime.jpg";
+import sanctuaryBookingMenu from "@/images/design/showcase/sanctuary/booking-menu.jpg";
+import sanctuaryCancelRefund from "@/images/design/showcase/sanctuary/cancel-refund.jpg";
+import sanctuaryHealerHome from "@/images/design/showcase/sanctuary/healer-home.jpg";
+import sanctuaryHealerKarte from "@/images/design/showcase/sanctuary/healer-karte.jpg";
+import sanctuaryMenu from "@/images/design/showcase/sanctuary/menu.jpg";
+import sanctuaryMypage from "@/images/design/showcase/sanctuary/mypage.jpg";
+import sanctuarySessionCall from "@/images/design/showcase/sanctuary/session-call.jpg";
+import sanctuarySessionLobby from "@/images/design/showcase/sanctuary/session-lobby.jpg";
+import sanctuaryStripeCard from "@/images/design/showcase/sanctuary/stripe-card.jpg";
+import sanctuaryStripeCheckout from "@/images/design/showcase/sanctuary/stripe-checkout.jpg";
+import sanctuaryTop from "@/images/design/showcase/sanctuary/top.jpg";
 import stripSkillTile from "@/images/design/strips/skill-tile.jpg";
 import stripSkillWide from "@/images/design/strips/skill-wide.jpg";
 import stripStoryTile from "@/images/design/strips/story-tile.jpg";
@@ -61,12 +90,12 @@ export type DesignFrame = {
   alt: string;
 };
 
-/** 横に流れるギャラリーの一枚。 */
-export type DesignIndustry = {
+/** 横に流れるギャラリーの一枚。制作したシステムの、ひとつの画面です。 */
+export type DesignShowcase = {
   id: string;
   /**
-   * 大きく出す業種名。長い名前は、行ごとに分けて書きます。
-   * 行をつなげたものが、業種名そのものになるようにしてください。
+   * 大きく出す題名。長い題名は、行ごとに分けて書きます。
+   * 行をつなげたものが、題名そのものになるようにしてください。
    */
   lines: readonly string[];
   /** 画像の下に小さく添える欧文。 */
@@ -304,36 +333,53 @@ export const design = {
   },
 
   /**
-   * 紹介文のあと、横に流れていく業種。並びは、開発実績のページ（/works）と同じです。
+   * 紹介文のあと、横に流れていく制作事例。これまでに作ったシステムの画面を、一枚ずつ並べます。
+   * いまは、レンタカー管理システム（11 枚）と、オンラインヒーリングサロン
+   * 「THE SANCTUARY」（18 枚）です。caption の頭には、どちらの画面かを書いています。
    *
-   * 画像は、本番の写真が用意できるまでの仮の絵です。src/images/design/industries/ の
-   * 同じ名前のファイルを上書きすれば、そのまま差し替わります。枠は 13:8 です。
-   * 比率の違う写真は、ゆがめずに、枠いっぱいになるよう切り抜いて表示します。
+   * 画像は src/images/design/showcase/ にあります。枠は 13:8 です。比率の違う画像は、
+   * ゆがめずに、枠いっぱいになるよう、中央を基準に切り抜いて表示します（はじめから
+   * 13:8 にしておけば、切り抜かれずに全体が出ます）。枚数を増やすと、そのぶん、
+   * 画面を固定して流す長さが延びます。
    */
-  industries: {
+  showcase: {
     /** 読み上げに使う、この区画の見出し。 */
-    heading: "これまでに携わってきた業種",
+    heading: "制作事例の画面（レンタカー管理システム・オンラインヒーリングサロン）",
     items: [
-      { id: "agriculture", lines: ["農林水産業"], caption: "AGRICULTURE, FORESTRY & FISHERIES", image: imgAgriculture },
-      { id: "manufacturing", lines: ["製造業"], caption: "MANUFACTURING", image: imgManufacturing },
-      { id: "retail", lines: ["小売・EC・飲食"], caption: "RETAIL, E-COMMERCE & FOOD", image: imgRetail },
-      { id: "healthcare", lines: ["医療・", "ヘルスケア"], caption: "MEDICAL & HEALTHCARE", image: imgHealthcare },
-      { id: "care", lines: ["介護・福祉"], caption: "NURSING CARE & WELFARE", image: imgCare },
-      { id: "government", lines: ["行政・公共"], caption: "GOVERNMENT & PUBLIC SERVICES", image: imgGovernment },
-      { id: "education", lines: ["教育"], caption: "EDUCATION", image: imgEducation },
-      { id: "finance", lines: ["金融・保険"], caption: "FINANCE & INSURANCE", image: imgFinance },
-      { id: "logistics", lines: ["物流・運輸・", "モビリティ"], caption: "LOGISTICS, TRANSPORT & MOBILITY", image: imgLogistics },
-      { id: "property", lines: ["不動産・建設"], caption: "REAL ESTATE & CONSTRUCTION", image: imgProperty },
-      { id: "energy", lines: ["エネルギー・", "環境"], caption: "ENERGY & ENVIRONMENT", image: imgEnergy },
-      { id: "operations", lines: ["バックオフィス・", "経営管理"], caption: "BACK OFFICE & MANAGEMENT", image: imgOperations },
-      { id: "media", lines: ["メディア・", "エンタメ・スポーツ"], caption: "MEDIA, ENTERTAINMENT & SPORTS", image: imgMedia },
-      { id: "security", lines: ["セキュリティ・", "インフラ"], caption: "SECURITY & INFRASTRUCTURE", image: imgSecurity },
-      { id: "research", lines: ["研究・科学・", "分野横断AI"], caption: "RESEARCH, SCIENCE & CROSS-DOMAIN AI", image: imgResearch },
-    ] satisfies DesignIndustry[],
+      { id: "rental-login", lines: ["レンタカー", "管理システム"], caption: "RENTAL CAR SYSTEM — LOGIN", image: rentalLogin },
+      { id: "rental-home", lines: ["ダッシュボード"], caption: "RENTAL CAR SYSTEM — DASHBOARD", image: rentalHome },
+      { id: "rental-vehicles", lines: ["車両一覧"], caption: "RENTAL CAR SYSTEM — VEHICLES", image: rentalVehicles },
+      { id: "rental-rentals", lines: ["貸出・返却"], caption: "RENTAL CAR SYSTEM — RENTALS & RETURNS", image: rentalRentals },
+      { id: "rental-invoice", lines: ["請求書の発行"], caption: "RENTAL CAR SYSTEM — INVOICES", image: rentalInvoice },
+      { id: "rental-insurers", lines: ["保険会社マスタ"], caption: "RENTAL CAR SYSTEM — INSURANCE COMPANIES", image: rentalInsurers },
+      { id: "rental-utilization", lines: ["稼働率表"], caption: "RENTAL CAR SYSTEM — UTILIZATION & SALES", image: rentalUtilization },
+      { id: "rental-import", lines: ["一括登録"], caption: "RENTAL CAR SYSTEM — BULK IMPORT", image: rentalImport },
+      { id: "rental-users", lines: ["利用者と権限"], caption: "RENTAL CAR SYSTEM — USERS & PERMISSIONS", image: rentalUsers },
+      { id: "rental-history", lines: ["操作履歴"], caption: "RENTAL CAR SYSTEM — ACTIVITY LOG", image: rentalHistory },
+      { id: "rental-backup", lines: ["自動バックアップ"], caption: "RENTAL CAR SYSTEM — AUTOMATIC BACKUPS", image: rentalBackup },
+      { id: "sanctuary-top", lines: ["オンライン", "ヒーリングサロン"], caption: "THE SANCTUARY — TOP PAGE", image: sanctuaryTop },
+      { id: "sanctuary-menu", lines: ["メニュー・料金"], caption: "THE SANCTUARY — MENU & PRICING", image: sanctuaryMenu },
+      { id: "sanctuary-apply", lines: ["入会の", "お申し込み"], caption: "THE SANCTUARY — MEMBERSHIP APPLICATION", image: sanctuaryApply },
+      { id: "sanctuary-mypage", lines: ["マイページ"], caption: "THE SANCTUARY — MY PAGE", image: sanctuaryMypage },
+      { id: "sanctuary-booking-menu", lines: ["ご予約", "メニューを選ぶ"], caption: "THE SANCTUARY — BOOKING: MENU", image: sanctuaryBookingMenu },
+      { id: "sanctuary-booking-datetime", lines: ["ご予約", "ヒーラーと日時"], caption: "THE SANCTUARY — BOOKING: HEALER & TIME", image: sanctuaryBookingDatetime },
+      { id: "sanctuary-booking-confirm", lines: ["ご予約", "内容の確認"], caption: "THE SANCTUARY — BOOKING: CONFIRMATION", image: sanctuaryBookingConfirm },
+      { id: "sanctuary-stripe-checkout", lines: ["Stripe決済"], caption: "THE SANCTUARY — STRIPE CHECKOUT", image: sanctuaryStripeCheckout },
+      { id: "sanctuary-stripe-card", lines: ["カード情報の入力"], caption: "THE SANCTUARY — CARD DETAILS", image: sanctuaryStripeCard },
+      { id: "sanctuary-booking-confirmed", lines: ["ご予約の確定"], caption: "THE SANCTUARY — BOOKING CONFIRMED", image: sanctuaryBookingConfirmed },
+      { id: "sanctuary-cancel-refund", lines: ["キャンセルと", "自動返金"], caption: "THE SANCTUARY — CANCELLATION & REFUND", image: sanctuaryCancelRefund },
+      { id: "sanctuary-session-lobby", lines: ["入室前の確認"], caption: "THE SANCTUARY — SESSION LOBBY", image: sanctuarySessionLobby },
+      { id: "sanctuary-session-call", lines: ["ビデオ通話と", "チャット"], caption: "THE SANCTUARY — VIDEO CALL & CHAT", image: sanctuarySessionCall },
+      { id: "sanctuary-beauty-filter", lines: ["美肌フィルター"], caption: "THE SANCTUARY — BEAUTY FILTER", image: sanctuaryBeautyFilter },
+      { id: "sanctuary-healer-home", lines: ["ヒーラーの画面"], caption: "THE SANCTUARY — HEALER HOME", image: sanctuaryHealerHome },
+      { id: "sanctuary-healer-karte", lines: ["会員様の", "カルテ"], caption: "THE SANCTUARY — CLIENT RECORDS", image: sanctuaryHealerKarte },
+      { id: "sanctuary-admin-reservations", lines: ["予約の管理"], caption: "THE SANCTUARY — ADMIN: RESERVATIONS", image: sanctuaryAdminReservations },
+      { id: "sanctuary-admin-sales", lines: ["売上の管理"], caption: "THE SANCTUARY — ADMIN: SALES", image: sanctuaryAdminSales },
+    ] satisfies DesignShowcase[],
   },
 
   /**
-   * 業種のギャラリーの最後に、右から入ってくる見出しと、そのあとに重なる白いカード。
+   * 制作事例のギャラリーの最後に、右から入ってくる見出しと、そのあとに重なる白いカード。
    * カードは画面に固定され、スクロールすると、見出しが一枚ずつ切り替わります。
    *
    * 見出しの絵は、仮の絵です。src/images/design/strips/ の同じ名前のファイルを
@@ -474,7 +520,7 @@ export const design = {
         title: "ABOUT",
         links: [
           { label: "Concept", href: "#design-concept" },
-          { label: "Industries", href: "#design-industries" },
+          { label: "Showcase", href: "#design-showcase" },
           { label: "Profile", href: "#design-profile" },
           { label: "Work Style", href: "#design-work" },
         ],

@@ -13,14 +13,14 @@ import styles from "./Design.module.css";
 import { DesignFooter } from "./DesignFooter";
 import { DesignHero } from "./DesignHero";
 import { HeartVeil } from "./HeartVeil";
-import { IndustryReel } from "./IndustryReel";
 import { LoveFlow } from "./LoveFlow";
 import { Records } from "./Records";
+import { ShowcaseReel } from "./ShowcaseReel";
 import { SmoothWheel } from "./SmoothWheel";
 import { WorkWall } from "./WorkWall";
 import { Writing } from "./Writing";
 
-const { about, concept, flow, footer, frames, hero, industries, profile, records, work } = design;
+const { about, concept, flow, footer, frames, hero, profile, records, showcase, work } = design;
 
 /** 「仕事の進め方」の見出しで、一部の語に使う、明朝の斜体。このページでだけ読みこみます。 */
 const serif = Instrument_Serif({
@@ -49,7 +49,7 @@ function textureUrl(src: string, width: number, ratio = 16 / 9) {
 
 /**
  * デザインページ（トップページ /）の本体。最初の画面、書かれていく文章、流れる大きな文字、
- * 暗い幕の上の紹介文、業種のギャラリー、ABOUT のカード、仕事の進め方、開発実績、
+ * 暗い幕の上の紹介文、制作事例のギャラリー、ABOUT のカード、仕事の進め方、開発実績、
  * いちばん下の案内を、この順に並べます。
  */
 export function Design() {
@@ -98,9 +98,9 @@ export function Design() {
       <HeartVeil>
         <LoveFlow heavy={flow.heavy} light={flow.light} label={flow.label} />
         <About id="design-about" label={about.label} paragraphs={about.paragraphs} />
-        <IndustryReel
-          heading={industries.heading}
-          items={industries.items.map((item) => ({
+        <ShowcaseReel
+          heading={showcase.heading}
+          items={showcase.items.map((item) => ({
             ...item,
             large: textureUrl(item.image.src, 1080, 13 / 8),
             small: textureUrl(item.image.src, 640, 13 / 8),
